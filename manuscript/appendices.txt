@@ -1,0 +1,6 @@
+# Appendencies
+
+{id: appendix-a}
+## Appendix A: Using `npm` instead of `yarn`
+
+## Workspace schematics
