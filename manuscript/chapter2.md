@@ -424,11 +424,11 @@ We were able to go without this prefix previously because the `workspace.json` c
 
 ```json
 {
-  (...)
+  // ...
   "cli": {
     "defaultCollection": "@nrwl/react"
   },
-  (...)
+  // ...
 }
 ```
 
@@ -501,7 +501,7 @@ export const BooksFeature = () => {
     getBooks().then(setBooks);
   }, [
     // This effect runs only once on first component render
-    // so we declare it as having no dependant state.
+    // so we declare it as having no dependent state.
   ]);
 
   return (
