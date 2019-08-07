@@ -1,5 +1,5 @@
 {id: chapter-3}
-# Chapter 3: Working effectively using Nx
+# Chapter 3: Working effectively in a monorepo
 
 In the previous two chapters we setup a `bookstore` application that renders a list of books for users to purchase.
 
@@ -15,7 +15,7 @@ nx dep-graph
 
 ![Dependency graph of the workspace](images/3-dep-graph.png)
 
-Nx knows the dependency graph of the workspace without us having to configure anything. Because of this ability, Nx also understands which projects within the workspace are affected by any given changeset. Moreover, it can help us verify that the affected projects are okay.
+Nx knows the dependency graph of the workspace without us having to configure anything. Because of this ability, Nx also understands which projects within the workspace are affected by any given changeset. Moreover, it can help us verify the correctness of the  affected projects.
 
 ## Understanding and verifying changes
 
@@ -23,13 +23,25 @@ Let's say we want to update `font-family` in our global styles.
 
 **libs/ui/src/lib/global-styles/global-styles.tsx**
 
-```tsx
-// ...
-body {
-  // Use system fonts from various platforms.
-  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-}
-// ...
+```
+import React from 'react';
+import { createGlobalStyle } from 'styled-components';
+
+export const GlobalStyles = createGlobalStyle`
+  body {
+    margin: 0;
+    font-size: 16px;
+markua-start-insert
+    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+markua-end-insert
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+`;
+
+export default GlobalStyles;
 ```
 
 We can ask Nx to show us how this change *affects* the projects within our workspace.
@@ -66,7 +78,7 @@ And just as with the `affected:dep-graph` command, the default base is the `mast
 
 Note that Nx uses  [Jest](https://jestjs.io) and [Cypress](https://www.cypress.io/) to run unit and e2e tests respectively. They make writing and running tests are fast and simple as possible. If you're not familiar with them, please read their documentation to learn more.
 
-So far we haven't been diligent on verifying that our changes are okay, so it isn't surprising that our tests are failing.
+So far we haven't been diligent about verifying that our changes are okay, so unsurprisingly our tests are failing.
 
 ![`nx affected:test` failed](images/3-failed-test.png)
 
@@ -82,11 +94,15 @@ There are three additional affected commands in Nx.
 
 The listing of affected applications and libraries can be useful in CI to trigger downstream jobs based on the output.
 
-And that about does it for affected commands. Next, we'll discuss everyone's favorite topic: *code style*.
+## Enforcing hard boundaries
+
+So far we've created soft boundaries around our libraries by labeling them as *feature*, *UI*, *data-access*, or *util*.
+
+(TODO: Complete this section)
 
 ## Automatic code formatting
 
-One of the easiest ways to waste time as a developer is on **code styles**. We can spend time *hours* debating with one another on whether we should use semicolons or not -- you should; or whether we should use a comma-first style or not -- you shouldn't.
+One of the easiest ways to waste time as a developer is on code style. We can spend time *hours* debating with one another on whether we should use semicolons or not -- you should; or whether we should use a comma-first style or not -- you shouldn't.
 
 [Prettier](https://prettier.io) was created to stop these endless debates over code style. It is highly opinionated and provides minimal configuration options. And best of all, it can format our code *automatically*! This means that we no longer need to manually fix code to conform to the code style.
 

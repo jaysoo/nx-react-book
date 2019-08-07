@@ -1,2 +1,3 @@
-{id: appendix-b}
-## Appendix B: Using `npm` instead of `yarn`
+{id: appendix-c}
+# Appendix C: Pre-commit git hook to automatically format code
+ 

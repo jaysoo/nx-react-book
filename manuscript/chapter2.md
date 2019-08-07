@@ -58,6 +58,7 @@ myorg
 ├── (...)
 ├── libs
 │   ├── (...)
+markua-start-insert
 │   └──products
 │       └── feature
 │           ├── src
@@ -69,6 +70,7 @@ myorg
 │           ├── tsconfig.app.json
 │           ├── tsconfig.json
 │           └── tsconfig.spec.json
+markua-end-insert
 └── (...)
 ```
 
@@ -79,7 +81,7 @@ nx lint books-feature
 nx test books-feature
 ```
 
-And now we have our library! Wasn't that easy? Something that may have taken minutes (or longer?) now takes only takes a few seconds.
+Now we have our library! Wasn't that easy? Something that may have taken minutes, or longer, now takes only takes a few seconds.
 
 You'll also see that the `App` component for `bookstore` has been updated to include the new route.
 
@@ -94,6 +96,7 @@ export const App = () => {
     <>
       <header>
         <h1>Welcome to the Bookstore!</h1>
+markua-start-insert
         <div role="navigation">
           <ul>
             <li>
@@ -101,9 +104,12 @@ export const App = () => {
             </li>
           </ul>
         </div>
+markua-end-insert
       </header>
+markua-start-insert
       <Route path="/books" component={BooksFeature} />
       <Route exact path="/" render={() => <Redirect to="/books" />} />
+markua-end-insert
     </>
   );
 };
@@ -116,39 +122,46 @@ Additionally, the `main.tsx` file for `bookstore` has also been updated to rende
 ```tsx
 import React from 'react';
 import ReactDOM from 'react-dom';
+markua-start-insert
 import { BrowserRouter } from 'react-router-dom';
+markua-end-insert
 
 import App from './app/app';
 
+markua-start-delete
+ReactDOM.render(<App />, document.getElementById('root'));
+markua-end-delete
+markua-start-insert
 ReactDOM.render(
   <BrowserRouter>
     <App />
   </BrowserRouter>,
   document.getElementById('root')
 );
+markua-end-insert
 ```
 
 Restart the development server by running `nx serve bookstore` again and you should see the updated application.
 
-Be aware that when you add a new project to the workspace, you must restart any running development servers. This restart is necessary in order for the TypeScript compiler to pick up new library paths, such as `@myorg/products/feature`.
+Be aware that when you add a new project to the workspace, you must restart your development server. This restart is necessary in order for the TypeScript compiler to pick up new library paths, such as `@myorg/books/feature`.
 
 ***
 
-To our despair, when we navigate to <http://localhost:4200> again, we see an ugly looking application.
+To our despair, when we navigate to <http://localhost:4200> again, we see a poorly styled application.
 
 ![](images/2-books-feature.png)
 
-Let's remedy this situation by adding a component library that will provide better styling!
+Let's remedy this situation by adding a component library that will provide better styling.
 
 ## UI libraries
 
-We can create new UI library as follows.
+Let's create the UI library.
 
 ```bash
 nx g lib ui --directory ''
 ```
 
-Please note that we will make heavy use of [`styled-components`](https://www.styled-components.com) in this component library. Don't fret if you are not familiar with `styled-components`. If you know CSS then you should not have a problem understanding this section. To learn more about `styled-components` you can check our their [documentation](https://www.styled-components.com/docs/basics).
+Please note that we will make heavy use of [`styled-components`](https://www.styled-components.com) in this component library. Don't fret if you're not familiar with `styled-components`. If you know CSS then you should not have a problem understanding this section. To learn more about `styled-components` you can check our their [documentation](https://www.styled-components.com/docs/basics).
 
 
 Back to the example. You should have a new folder: `libs/ui`.
@@ -158,6 +171,7 @@ myorg
 ├── (...)
 ├── libs
 │   ├── (...)
+markua-start-insert
 │   ├── ui
 │   │   ├── src
 │   │   │   ├── lib
@@ -168,6 +182,7 @@ myorg
 │   │   ├── tsconfig.app.json
 │   │   ├── tsconfig.json
 │   │   └── tsconfig.spec.json
+markua-end-insert
 └── (...)
 ```
 
@@ -405,17 +420,17 @@ We'll save our progress with a new commit.
 
 ```bash
 git add .
-git commit -m 'Add products feature and ui libraries'
+git commit -m 'Add books feature and ui libraries'
 ```
 
-That's great, but we are still not seeing any products, so let's do something about this.
+That's great, but we are still not seeing any books, so let's do something about this.
 
 ## Data-access libraries
 
-What we want to do is fetch data from *somewhere* and display that in our products feature. Since we will be calling a backend service we should create a new **data-access** library.
+What we want to do is fetch data from *somewhere* and display that in our books feature. Since we will be calling a backend service we should create a new **data-access** library.
 
 ```bash
-nx g @nrwl/web:lib data-access --directory products
+nx g @nrwl/web:lib data-access --directory books
 ``` 
 
 You may have noticed that we are using a prefix `@nrwl/web:lib` instead of just `lib` like in our previous examples. This `@nrwl/web:lib` syntax means that we want Nx to run the `lib` (or `library`) schematic provided by the `@nrwl/web` collection.
@@ -436,7 +451,7 @@ In this case, the `@nrwl/web:lib` schematic will create a library to be used in 
 
 Back to the example. Let's modify the library to export a `getBooks` function to load our list of books.
 
-**libs/products/data-access/src/lib/products-data-access.ts**
+**libs/books/data-access/src/lib/books-data-access.ts**
 
 ```typescript
 export async function getBooks(): Promise<any[]> {
@@ -445,37 +460,32 @@ export async function getBooks(): Promise<any[]> {
   return [
     {
       id: 1,
-      name: 'The Picture of Dorian Gray ',
+      name: 'The Picture of Dorian Gray',
       author: 'Oscar Wilde',
-      rating: 5,
       price: 9.99
     },
     {
       id: 2,
       name: 'Frankenstein',
       author: 'Mary Wollstonecraft Shelley',
-      rating: 4,
       price: 7.95
     },
     {
       id: 3,
       name: 'Jane Eyre',
       author: 'Charlotte Brontë',
-      rating: 4.5,
       price: 10.95
     },
     {
       id: 4,
       name: 'Dracula',
       author: 'Bram Stoker',
-      rating: 4,
       price: 14.99
     },
     {
       id: 5,
       name: 'Pride and Prejudice',
       author: 'Jane Austen',
-      rating: 4.5,
       price: 12.85
     }
   ];
@@ -491,8 +501,8 @@ The next step is to use the `getBooks` function within our `books` feature. We c
 ```tsx
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getBooks } from '@myorg/products/data-access';
-import { Books, Book } from '@myorg/products/ui';
+import { getBooks } from '@myorg/bookss/data-access';
+import { Books, Book } from '@myorg/bookss/ui';
 
 export const BooksFeature = () => {
   const [books, setBooks] = useState([]);
@@ -522,16 +532,16 @@ export default BooksFeature;
 You'll notice that we're using two new components: `Books` and `Book`. They can be created as follows.
 
 ```bash
-nx g lib ui --directory products
-nx g component Books --project products-ui --export
-nx g component Book --project products-ui
+nx g lib ui --directory books
+nx g component Books --project books-ui --export
+nx g component Book --project books-ui
 ```
 
 We generally want to put *presentational* components into their own UI library. This will prevent effects from bleeding into them, thus making them easier to understand and test.
 
 Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
  
-**libs/products/ui/src/lib/books/books.tsx**
+**libs/books/ui/src/lib/books/books.tsx**
 ```tsx
 import React from 'react';
 import styled from 'styled-components';
@@ -559,7 +569,7 @@ export const Books = ({ books }: BooksProps) => {
 export default Books;
 ```
 
-**libs/products/ui/src/lib/book/book.tsx**
+**libs/books/ui/src/lib/book/book.tsx**
 
 ```tsx
 import React from 'react';
@@ -585,9 +595,6 @@ const StyledBook = styled.div`
   .title {
     flex: 1;
   }
-  .rating {
-    color: #999;
-  }
   .price {
     color: #478d3c;
   }
@@ -599,7 +606,6 @@ export const Book = ({ book, onAdd }: BookProps) => {
       <span className="title">
         {book.name} by <em>{book.author}</em>
       </span>
-      <span className="rating">{book.rating}</span>
       <span className="price">${book.price}</span>
       <span>
         <Button onClick={() => onAdd(book)}>Add To Cart</Button>
@@ -617,9 +623,9 @@ Restart the server to check out our feature in action.
 
 That's great and all, but you may have observed a couple of problems.
 
-1. The `getProducts` data-access function is a stub and doesn't actually call out to a backend service.
+1. The `getBooks` data-access function is a stub and doesn't actually call out to a backend service.
    
-2. We've been using `any` types when dealing with books data. For example, the return type of `getProducts` is `any[]` and our `BookProp` takes specifies `{ book: any }`. This makes our code unsafe and can lead to production bugs.
+2. We've been using `any` types when dealing with books data. For example, the return type of `getBooks` is `any[]` and our `BookProp` takes specifies `{ book: any }`. This makes our code unsafe and can lead to production bugs.
    
 We'll address both problems in the [next chapter](#chapter-3).
 

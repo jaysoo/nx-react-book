@@ -1,3 +1,3 @@
-{id: appendix-c}
-# Appendix C: Pre-commit git hook to automatically format code
+{id: appendix-a}
+# Appendix A: Workspace schematics
  

@@ -1,2 +1,2 @@
 {id: appendix-b}
-## Appendix B: Using `npm` instead of `yarn`
+# Appendix B: Using `npm` instead of `yarn`
