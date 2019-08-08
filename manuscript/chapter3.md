@@ -226,20 +226,20 @@ Everything looks good so let's run it for real.
 nx g @nrwl/express:app api --no-interactive
 ```
 
-We can start the API server.
+Just like our frontend application, we can use Nx to serve the API.
 
 ```bash
 nx serve api
 ```
 
-And when we open up `http://localhost:3333/api` we'll be greeted by a nice message. (How nice!)
+And when we open up `http://localhost:3333/api` we'll be greeted by a nice message.
 
 ```json
 
 { "message": "Welcome to api!" }
 ```
 
-Next, let's add a handler for `/api/books` so we can use this in our `books-data-access` library. But first, we need to add CORS support to our API because it is running on a different port.
+Next, let's add the `/api/books` endpoint so that we can use this in our `books-data-access` library. But first, we need to add CORS support to our API because it is running on a different port.
 
 ```bash
 npm install cors
@@ -334,15 +334,13 @@ If we restart both applications--`nx serve api` and `nx serve bookstore`--we'll 
 
 ### Sharing models between frontend and backend
 
-Recall that we've previously used the `any` type when working with books data. This is a bad idea as it may lead to uncaught type errors in the future.
+Recall that we previously used the `any` type when working with books data. This is a bad practice as it may lead to uncaught type errors in the future.
 
-A better idea would be to create a utility library that containing shared models that will be used by both the frontend and the backend.
+A better idea would be to create a utility library containing some shared models to be used by both the frontend and backend.
 
 ```bash
 nx g @nrwl/node:lib shared-models --no-interactive
 ```
-
-Let's define the book model.
 
 **libs/shared-models/src/lib/shared-models.ts**
 
@@ -356,13 +354,7 @@ export interface IBook {
 }
 ```
 
-And now we can update the following files to use the new model:
-
-- `apps/api/src/main.ts`
-- `libs/products/data-access/src/lib/products-data-access.ts`
-- `libs/books/feature/src/lib/books-feature/books-feature.tsx`
-- `libs/products/ui/src/lib/books/books.tsx`
-- `libs/products/ui/src/lib/book/book.tsx`
+And now we can update the following five files to use the new model:
 
 **apps/api/src/main.ts**
 
@@ -464,9 +456,9 @@ markua-end-insert
 export default Book;
 ```
 
-By using Nx, we have created a shared model library and refactored both frontend and backend code in around a minute.
+By using Nx, we have created a shared model library and refactored both frontend and backend code in about a minute.
 
-A major benefit of working within a monorepo is that we can check in these changes as a *single commit*. This means that the corresponding pull-request will contain the full story, rather than having the changes be fragmented amongst multiple pull-requests and repositories. 
+Another major benefit of working within a monorepo is that we can check in these changes as a *single commit*. This means that the corresponding pull-request contains the full story, rather than being fragmented amongst multiple pull-requests and repositories. 
 
 ## Enforcing hard boundaries
 
@@ -503,7 +495,7 @@ T> We can ask Nx to generate the dependency graph automatically, as well as high
 T>
 T> Nx can retest and rebuild only the affected projects within our workspace.
 T>
-T> By using a monorepo, related changes in different projects can be in the same changeset (i.e. pull-request), which gives us a full picture of the changes.
+T> By using a monorepo, related changes in different projects can be in the same changeset (i.e. pull-request), which gives us the full picture of the changes.
 T>
 T> Nx allows us to strictly enforce library project boundaries. 
 T>
