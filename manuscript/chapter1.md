@@ -83,7 +83,7 @@ The `apps` folder contain the code of all applications in our workspace. Nx has 
 
 The `libs` folder will eventually contain our libraries (more on that in [Chapter 2](#chapter-2)). It is empty for now.
 
-The `tools` folder can be used for scripts that are specific to the workspace. The generated `tools/schematics` folder is for Nx's workspace schematics feature which we cover in [Appendix A](#appendix_a).
+The `tools` folder can be used for scripts that are specific to the workspace. The generated `tools/schematics` folder is for Nx's workspace schematics feature which we cover in [Appendix A](#appendix-a).
 
 The `nx.json` file configures Nx (as we'll see in [Chapter 4](#chapter-4)).
 
