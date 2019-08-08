@@ -456,9 +456,12 @@ leanpub-end-insert
 export default Book;
 ```
 
+![dependency graph with `api` and `shared-models`](images/3-shared-models-graph.png)
+
 By using Nx, we have created a shared model library and refactored both frontend and backend code in about a minute.
 
 Another major benefit of working within a monorepo is that we can check in these changes as a *single commit*. This means that the corresponding pull-request contains the full story, rather than being fragmented amongst multiple pull-requests and repositories. 
+
 
 ## Enforcing hard boundaries
 

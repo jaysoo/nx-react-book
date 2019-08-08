@@ -65,8 +65,8 @@ Okay, the last bullet point is a bit of a joke, but there are common concerns re
 There are a few common concerns that people may have when they consider using a monorepo.
 
 - Continuous integration (CI) is slow
-- Everyone can change my code
-- Lack of autonomy of each team
+- "Everyone can change *my* code"
+- Teams losing their autonomy
 
 All three of these issues will be addressed throughout this book.
 
