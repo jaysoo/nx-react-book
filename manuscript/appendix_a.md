@@ -1,3 +1,3 @@
 {id: appendix-a}
-# Appendix A: Workspace schematics
+# Appendix A: Shallow dive into workspace.json
  

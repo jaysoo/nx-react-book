@@ -1,9 +1,9 @@
 {id: chapter-3}
 # Chapter 3: Working effectively in a monorepo
 
-In the previous two chapters we setup a `bookstore` application that renders a list of books for users to purchase.
+In the previous two chapters we set up a `bookstore` application that renders a list of books for users to purchase.
 
-In this chapter we explore the tools that Nx provides us with to enable us to work more effectively.
+In this chapter we explore how Nx enables us to work more effectively.
 
 ## The dependency graph
 
@@ -19,29 +19,133 @@ Nx knows the dependency graph of the workspace without us having to configure an
 
 ## Understanding and verifying changes
 
-Let's say we want to update `font-family` in our global styles.
+Let's say we want to add a **checkout** button to each of the books in the list.
 
-**libs/ui/src/lib/global-styles/global-styles.tsx**
+We can update our `Book`, `Books`, and `BooksFeature` components to pass along a new `onAdd` callback prop.
+
+**libs/books/ui/src/lib/book/book.tsx**
 
 ```
 import React from 'react';
-import { createGlobalStyle } from 'styled-components';
-
-export const GlobalStyles = createGlobalStyle`
-  body {
-    margin: 0;
-    font-size: 16px;
+import styled from 'styled-components';
 markua-start-insert
-    font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+import { Button } from '@myorg/ui';
 markua-end-insert
-  }
 
-  * {
-    box-sizing: border-box;
+export interface BookProps {
+  book: any;
+markua-start-insert
+  onAdd: (book: any) => void;
+markua-end-insert
+}
+
+const StyledBook = styled.div`
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  &:last-child {
+    border-bottom: none;
+  }
+  > span {
+    padding: 1rem 0.5rem;
+    margin-right: 0.5rem;
+  }
+  .title {
+    flex: 1;
+  }
+  .rating {
+    color: #999;
+  }
+  .price {
+    color: #478d3c;
   }
 `;
 
-export default GlobalStyles;
+export const Book = ({ book, onAdd }: BookProps) => {
+  return (
+    <StyledBook>
+      <span className="title">
+        {book.title} by <em>{book.author}</em>
+      </span>
+      <span className="rating">{book.rating}</span>
+      <span className="price">${book.price}</span>
+markua-start-insert
+      <span>
+        <Button onClick={() => onAdd(book)}>Add to Cart</Button>
+      </span>
+markua-end-insert
+    </StyledBook>
+  );
+};
+
+export default Book;
+```
+
+**libs/books/ui/src/lib/books/books.tsx**
+
+```javascript
+import React from 'react';
+import styled from 'styled-components';
+import { Book } from '../book/book';
+
+export interface BooksProps {
+  books: any[];
+markua-start-insert
+  onAdd: (book: any) => void;
+markua-end-insert
+}
+
+const StyledBooks = styled.div`
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
+
+markua-start-insert
+export const Books = ({ books, onAdd }: BooksProps) => {
+markua-end-insert
+  return (
+    <StyledBooks>
+      {books.map(book => (
+markua-start-insert
+        <Book key={book.id} book={book} onAdd={onAdd} />
+markua-end-insert
+      ))}
+    </StyledBooks>
+  );
+};
+
+export default Books;
+```
+
+**libs/books/feature/src/lib/books-feature/books-feature.tsx**
+
+```javascript
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { getBooks } from '@myorg/bookss/data-access';
+import { Books, Book } from '@myorg/bookss/ui';
+
+export const BooksFeature = () => {
+  const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    getBooks().then(setBooks);
+  }, [
+    // This effect runs only once on first component render
+    // so we declare it as having no dependent state.
+  ]);
+
+  return (
+    <>
+      <h2>Books</h2>
+markua-start-insert
+      <Books books={books} onAdd={book => alert(`Added ${book.title}`)} />
+markua-end-insert
+    </>
+  );
+};
+
+export default BooksFeature;
 ```
 
 We can ask Nx to show us how this change *affects* the projects within our workspace.
@@ -52,21 +156,21 @@ nx affected:dep-graph
 
 ![Affected dependencies](images/3-affected-dep-graph.png)
 
-As we can see, Nx knows that the `ui` library has changed from the `master` branch, and has indicated all of the dependent projects affected by this change in *red*. Furthermore, Nx also allows us to retest only the affected projects.
+As we can see, Nx knows that the `books` library has changed from the `master` branch; it has indicates the dependent projects affected by this change in *red*. Furthermore, Nx also allows us to retest only the affected projects.
 
-We can **lint** (ESLint) the projects affected by the changeset. 
+We can **lint** the projects affected by the changeset. 
 
 ```bash
 nx affected:lint --parallel
 ```
 
-Or run **unit tests** (Jest) for the affected projects.
+Or run **unit tests** for the affected projects.
 
 ```bash
 nx affected:test --parallel
 ```
 
-Or even run **e2e tests** (Cypress) for the affected projects.
+Or even run **e2e tests** for the affected projects.
 
 ```bash
 nx affected:e2e --parallel
@@ -76,7 +180,9 @@ Nx topologically sorts the projects so they are run from bottom to top. That is,
 
 And just as with the `affected:dep-graph` command, the default base is the `master` branch. This default branch should be correct most of the time, but can be changed with the `--base=[branch]` option. For example, if your team uses git-flow then you may want to use `--base=develop` when doing work on the development branch.
 
-Note that Nx uses  [Jest](https://jestjs.io) and [Cypress](https://www.cypress.io/) to run unit and e2e tests respectively. They make writing and running tests are fast and simple as possible. If you're not familiar with them, please read their documentation to learn more.
+A> Note that in these projects, Nx is using [Jest](https://jestjs.io) and [Cypress](https://www.cypress.io/) to run unit and e2e tests respectively. They make writing and running tests are fast and simple as possible. If you're not familiar with them, please read their documentation to learn more.
+A>
+A> It is possible to use different runners by specifying them in `workspace.json`. See [Appendix A](#appendix-a) for more information.
 
 So far we haven't been diligent about verifying that our changes are okay, so unsurprisingly our tests are failing.
 
@@ -84,7 +190,7 @@ So far we haven't been diligent about verifying that our changes are okay, so un
 
 ![`nx affected:e2e` failed](images/3-failed-e2e.png)
 
-I'll leave it to you as an exercise to fix the unit and e2e tests. **Tip:** Run the tests in watch mode by passing the `--watch` option so that tests are rerun whenever the source or test code change.
+I'll leave it to you as an exercise to fix the broken unit and e2e tests. **Tip:** Run the tests in watch mode by passing the `--watch` option so that tests are rerun whenever the source or test code change.
 
 There are three additional affected commands in Nx.
 
@@ -94,6 +200,274 @@ There are three additional affected commands in Nx.
 
 The listing of affected applications and libraries can be useful in CI to trigger downstream jobs based on the output.
 
+## Adding the API application
+
+By the way, now is a good time to commit your changes if you haven't done so already.
+
+So far our `bookstore` application does not communicate with a real backend service. Let's create one using the [Express](https://expressjs.com) framework.
+
+We'll need to install the `@nrwl/express` collection first.
+
+```bash
+yarn --dev @nrwl/express
+```
+
+Then we can do a dry run of the generate command.
+
+```bash
+nx g @nrwl/express:app api --no-interactive --dry-run
+```
+
+![Preview of the file changes](images/3-api-dry-run.png)
+
+Everything looks good so let's run it for real.
+
+```bash
+nx g @nrwl/express:app api --no-interactive
+```
+
+We can start the API server.
+
+```bash
+nx serve api
+```
+
+And when we open up `http://localhost:3333/api` we'll be greeted by a nice message. (How nice!)
+
+```json
+
+{ "message": "Welcome to api!" }
+```
+
+Next, let's add a handler for `/api/books` so we can use this in our `books-data-access` library. But first, we need to add CORS support to our API because it is running on a different port.
+
+```bash
+npm install cors
+```
+
+Now, we can add our new handler to the API application.
+
+```typescript
+import * as express from 'express';
+markua-start-insert
+import * as cors from 'cors';
+markua-end-insert
+
+const app = express();
+
+markua-start-insert
+app.use(cors());
+markua-end-insert
+
+app.get('/api', (req, res) => {
+  res.send({ message: 'Welcome to api!' });
+});
+
+markua-start-insert
+app.get('/api/books', (req, res) => {
+  const books: any[] = [
+    {
+      id: 1,
+      title: 'The Picture of Dorian Gray ',
+      author: 'Oscar Wilde',
+      rating: 5,
+      price: 9.99
+    },
+    {
+      id: 2,
+      title: 'Frankenstein',
+      author: 'Mary Wollstonecraft Shelley',
+      rating: 4,
+      price: 7.95
+    },
+    {
+      id: 3,
+      title: 'Jane Eyre',
+      author: 'Charlotte Brontë',
+      rating: 4.5,
+      price: 10.95
+    },
+    {
+      id: 4,
+      title: 'Dracula',
+      author: 'Bram Stoker',
+      rating: 4,
+      price: 14.99
+    },
+    {
+      id: 5,
+      title: 'Pride and Prejudice',
+      author: 'Jane Austen',
+      rating: 4.5,
+      price: 12.85
+    }
+  ];
+  res.send(books);
+});
+markua-end-insert
+
+const port = process.env.port || 3333;
+const server = app.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}/api`);
+});
+server.on('error', console.error);
+```
+
+And then update the data-access library to call this new endpoint.
+
+**libs/books/data-access/src/lib/books-data-access.ts**
+
+```typescript
+export async function getBooks() {
+  const data = await fetch('http://localhost:3333/api/books', {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  return data.json();
+}
+```
+
+If we restart both applications--`nx serve api` and `nx serve bookstore`--we'll see that our [bookstore](http://localhost:4200) still loads in the browser. And we can also verify that our `/api/books` endpoint is indeed being called.
+
+![](images/3-api-verify.png)
+
+### Sharing models between frontend and backend
+
+Recall that we've previously used the `any` type when working with books data. This is a bad idea as it may lead to uncaught type errors in the future.
+
+A better idea would be to create a utility library that containing shared models that will be used by both the frontend and the backend.
+
+```bash
+nx g @nrwl/node:lib shared-models --no-interactive
+```
+
+Let's define the book model.
+
+**libs/shared-models/src/lib/shared-models.ts**
+
+```javascript
+export interface IBook {
+  id: number;
+  title: string;
+  author: string;
+  rating: number;
+  price: number;
+}
+```
+
+And now we can update the following files to use the new model:
+
+- `apps/api/src/main.ts`
+- `libs/products/data-access/src/lib/products-data-access.ts`
+- `libs/books/feature/src/lib/books-feature/books-feature.tsx`
+- `libs/products/ui/src/lib/books/books.tsx`
+- `libs/products/ui/src/lib/book/book.tsx`
+
+**apps/api/src/main.ts**
+
+```typescript
+...
+
+app.get('/api/books', (req, res) => {
+markua-start-insert
+  const products: IBook[] = [
+markua-end-insert
+    ...
+  ];
+  res.send(products);
+});
+
+...
+```
+
+**libs/products/data-access/src/lib/products-data-access.ts**
+
+```javascript
+markua-start-insert
+import { IBook } from '@myorg/shared-models';
+markua-end-insert
+
+markua-start-insert
+export async function getBooks(): Promise<IBook[]> {
+markua-end-insert
+  const data = await fetch('http://localhost:3333/api/books');
+  return data.json();
+}
+
+```
+
+**libs/books/feature/src/lib/books-feature/books-feature.tsx**
+
+```javascript
+...
+markua-start-insert
+import { IBook } from '@myorg/shared-models';
+markua-end-insert
+
+export const BooksFeature = () => {
+markua-start-insert
+  const [books, setBooks] = useState([] as IBook[]);
+markua-end-insert
+
+  ...
+
+  return (
+    <>
+      <h2>Books</h2>
+      <Books books={books} onAdd={book => alert(`Added ${book.title}`)} />
+    </>
+  );
+};
+
+export default BooksFeature;
+```
+
+**libs/products/ui/src/lib/books/books.tsx**
+
+```javascript
+...
+markua-start-insert
+import { IBook } from '@myorg/shared-models';
+markua-end-insert
+
+
+export interface BooksProps {
+markua-start-insert
+  books: IBook[];
+  onAdd: (book: IBook) => void;
+markua-end-insert
+}
+
+...
+
+export default Books;
+```
+
+**libs/products/ui/src/lib/book/book.tsx**
+
+```javascript
+...
+markua-start-insert
+import { IBook } from '@myorg/shared-models';
+markua-end-insert
+
+export interface BookProps {
+markua-start-insert
+  book: IBook;
+  onAdd: (book: IBook) => void;
+markua-end-insert
+}
+
+...
+
+export default Book;
+```
+
+By using Nx, we have created a shared model library and refactored both frontend and backend code in around a minute.
+
+A major benefit of working within a monorepo is that we can check in these changes as a *single commit*. This means that the corresponding pull-request will contain the full story, rather than having the changes be fragmented amongst multiple pull-requests and repositories. 
+
 ## Enforcing hard boundaries
 
 So far we've created soft boundaries around our libraries by labeling them as *feature*, *UI*, *data-access*, or *util*.
@@ -102,7 +476,7 @@ So far we've created soft boundaries around our libraries by labeling them as *f
 
 ## Automatic code formatting
 
-One of the easiest ways to waste time as a developer is on code style. We can spend time *hours* debating with one another on whether we should use semicolons or not -- you should; or whether we should use a comma-first style or not -- you shouldn't.
+One of the easiest ways to waste time as a developer is on code style. We can spend time *hours* debating with one another on whether we should use semicolons or not--you should; or whether we should use a comma-first style or not--you shouldn't.
 
 [Prettier](https://prettier.io) was created to stop these endless debates over code style. It is highly opinionated and provides minimal configuration options. And best of all, it can format our code *automatically*! This means that we no longer need to manually fix code to conform to the code style.
 
@@ -127,7 +501,11 @@ T> Nx understands the dependency graph of projects within our workspace.
 T> 
 T> We can ask Nx to generate the dependency graph automatically, as well as highlight the parts of the graph that are affected by a given changeset.
 T>
-T> Nx can retest (ESLint, Jest, Cypress) and rebuild only the affected projects within our workspace.
+T> Nx can retest and rebuild only the affected projects within our workspace.
+T>
+T> By using a monorepo, related changes in different projects can be in the same changeset (i.e. pull-request), which gives us a full picture of the changes.
+T>
+T> Nx allows us to strictly enforce library project boundaries. 
 T>
 T> Nx automatically formats our code for us in an opinionated way using Prettier.
   

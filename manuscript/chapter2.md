@@ -59,7 +59,7 @@ myorg
 ├── libs
 │   ├── (...)
 markua-start-insert
-│   └──products
+│   └──books
 │       └── feature
 │           ├── src
 │           │   ├── lib
@@ -81,11 +81,9 @@ nx lint books-feature
 nx test books-feature
 ```
 
-Now we have our library! Wasn't that easy? Something that may have taken minutes, or longer, now takes only takes a few seconds.
-
 You'll also see that the `App` component for `bookstore` has been updated to include the new route.
 
-```tsx
+```javascript
 import React from 'react';
 import { Link, Redirect, Route } from 'react-router-dom';
 
@@ -119,7 +117,7 @@ export default App;
 
 Additionally, the `main.tsx` file for `bookstore` has also been updated to render `<BrowserRouter />`. This render is needed in order for `<Route />` components to work, and Nx will handle the file update for us if necessary.
 
-```tsx
+```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
 markua-start-insert
@@ -128,9 +126,6 @@ markua-end-insert
 
 import App from './app/app';
 
-markua-start-delete
-ReactDOM.render(<App />, document.getElementById('root'));
-markua-end-delete
 markua-start-insert
 ReactDOM.render(
   <BrowserRouter>
@@ -141,9 +136,18 @@ ReactDOM.render(
 markua-end-insert
 ```
 
+
 Restart the development server by running `nx serve bookstore` again and you should see the updated application.
 
-Be aware that when you add a new project to the workspace, you must restart your development server. This restart is necessary in order for the TypeScript compiler to pick up new library paths, such as `@myorg/books/feature`.
+I> Be aware that when you add a new project to the workspace, you must restart your development server. This restart is necessary in order for the TypeScript compiler to pick up new library paths, such as `@myorg/books/feature`.
+
+By using a monorepo, we've' *skipped* a few steps that are usually required when creating a new library.
+
+- Setting up the repo
+- Setting up the CI
+- Setting up the publishing pipeline--such as artifactory
+
+And now we have our library! Wasn't that easy? Something that may have taken minutes or hours--sometimes even days--now takes only takes a few seconds.
 
 ***
 
@@ -158,8 +162,10 @@ Let's remedy this situation by adding a component library that will provide bett
 Let's create the UI library.
 
 ```bash
-nx g lib ui --directory ''
+nx g lib ui --no-interactive
 ```
+
+The `--no-interactive` tells Nx to not prompt us with options, but instead use the default values.
 
 Please note that we will make heavy use of [`styled-components`](https://www.styled-components.com) in this component library. Don't fret if you're not familiar with `styled-components`. If you know CSS then you should not have a problem understanding this section. To learn more about `styled-components` you can check our their [documentation](https://www.styled-components.com/docs/basics).
 
@@ -213,7 +219,7 @@ This component is useful for overriding global style rules such as `body { margi
 
 **libs/ui/src/lib/global-styles/global-styles.tsx**
 
-```tsx
+```javascript
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
@@ -238,7 +244,7 @@ This component is pretty self-explanatory. It renders a styled button and passes
 
 **libs/ui/src/lib/button/button.tsx**
 
-```tsx
+```javascript
 import React, { ButtonHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -271,7 +277,7 @@ These two components are used for layout. The header component forms the top hea
 
 **libs/ui/src/lib/header/header.tsx**
 
-```tsx
+```javascript
 import React, { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -307,7 +313,7 @@ export default Header;
 
 **libs/ui/src/lib/main/main.tsx**
 
-```tsx
+```javascript
 import React, { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -330,7 +336,7 @@ And finally, the `NavigationList` and `NavigationItem` components will render th
 
 **libs/ui/src/lib/navigation-list/navigation-list.tsx**
 
-```tsx
+```javascript
 import React, { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -355,7 +361,7 @@ export default NavigationList;
 
 **libs/ui/src/lib/navigation-item/navigation-item.tsx**
 
-```tsx
+```javascript
 import React, { LiHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -376,7 +382,7 @@ Now we can use the new library in our `bookstore`'s app component.
 
 **apps/bookstore/src/app/app.tsx**
 
-```tsx
+```javascript
 import React from 'react';
 import { Link, Redirect, Route } from 'react-router-dom';
 
@@ -454,37 +460,42 @@ Back to the example. Let's modify the library to export a `getBooks` function to
 **libs/books/data-access/src/lib/books-data-access.ts**
 
 ```typescript
-export async function getBooks(): Promise<any[]> {
+export async function getBooks() {
   // TODO: We'll wire this up to an actual API later.
   // For now we are just returning some fixtures.
   return [
     {
       id: 1,
-      name: 'The Picture of Dorian Gray',
+      title: 'The Picture of Dorian Gray',
       author: 'Oscar Wilde',
+      rating: 3,
       price: 9.99
     },
     {
       id: 2,
-      name: 'Frankenstein',
+      title: 'Frankenstein',
       author: 'Mary Wollstonecraft Shelley',
+      rating: 5,
       price: 7.95
     },
     {
       id: 3,
-      name: 'Jane Eyre',
+      title: 'Jane Eyre',
       author: 'Charlotte Brontë',
+      rating: 4,
       price: 10.95
     },
     {
       id: 4,
-      name: 'Dracula',
+      title: 'Dracula',
       author: 'Bram Stoker',
+      rating: 5,
       price: 14.99
     },
     {
       id: 5,
-      name: 'Pride and Prejudice',
+      title: 'Pride and Prejudice',
+      rating: 4,
       author: 'Jane Austen',
       price: 12.85
     }
@@ -498,7 +509,7 @@ The next step is to use the `getBooks` function within our `books` feature. We c
 
 **libs/books/feature/src/lib/books-feature/books-feature.tsx**
 
-```tsx
+```javascript
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@myorg/bookss/data-access';
@@ -517,11 +528,7 @@ export const BooksFeature = () => {
   return (
     <>
       <h2>Books</h2>
-      <Books>
-        {books.map(book => (
-          <Books books={books} onAdd={book => alert(`Added ${book.name}`)} />
-        ))}
-      </Books>
+      <Books books={books} />
     </>
   );
 };
@@ -542,7 +549,8 @@ We generally want to put *presentational* components into their own UI library. 
 Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
  
 **libs/books/ui/src/lib/books/books.tsx**
-```tsx
+
+```javascript
 import React from 'react';
 import styled from 'styled-components';
 import { Book } from '../book/book';
@@ -571,14 +579,13 @@ export default Books;
 
 **libs/books/ui/src/lib/book/book.tsx**
 
-```tsx
+```javascript
 import React from 'react';
 import styled from 'styled-components';
 import { Button } from '@myorg/ui';
 
 export interface BookProps {
   book: any;
-  onAdd: (book: any) => void;
 }
 
 const StyledBook = styled.div`
@@ -600,16 +607,13 @@ const StyledBook = styled.div`
   }
 `;
 
-export const Book = ({ book, onAdd }: BookProps) => {
+export const Book = ({ book }: BookProps) => {
   return (
     <StyledBook>
       <span className="title">
-        {book.name} by <em>{book.author}</em>
+        {book.title} by <em>{book.author}</em>
       </span>
       <span className="price">${book.price}</span>
-      <span>
-        <Button onClick={() => onAdd(book)}>Add To Cart</Button>
-      </span>
     </StyledBook>
   );
 };
@@ -635,6 +639,6 @@ T> **Key points**
 T>
 T> Libraries are separated into four types: *feature*, *UI*, *data-access*, and *util*.
 T> 
-T> Nx provides us with the `nx generate` or `nx g` command to *quickyl* create new libraries from scratch.
+T> Nx provides us with the `nx generate` or `nx g` command to *quickly* create new libraries from scratch.
 T>
 T> When running `nx g` we can optionally provide a collection such as `@nrwl/web:lib` as opposed to `lib`. This will tell Nx to use the schematic from that specific collection rather than taking the workspace's `defaultCollection`. 

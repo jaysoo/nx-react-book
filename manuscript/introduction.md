@@ -2,24 +2,25 @@
 
 If you've ever worked at a company with more than one team, chances are you've had to deal with some challenges when it comes to change management.
 
-In a typical work setting, development teams are divided by domain or technology. For example, you may have one frontend team building the UI in React, and one backend team building the API in Express. These teams usually have their own code repositories, so changes to the software as a whole requires juggling multiple repositories.
+In a typical work setting, development teams are divided by domain or technology. For example, one team building the UI in React, and another one building the API in Express. These teams usually have their own code repositories, so changes to the software as a whole requires juggling multiple repositories.
 
 A few problems that arise from a multi-repository setup include:
 
 - Lack of collaboration because sharing code is hard and expensive.
 - Lack of consistency in linting, testing, and release processes.
+- Lack of developer mobility between projects because access may be unavailable or the development experience vary too greatly.
 - Difficulty in coordinating changes across repositories.
 - Late discovery of bugs because they can only occur at the point of integration rather than when code is changed.
 
 ## Monorepos to the rescue!
 
-A lot of successful organizations such as Google, Facebook, and Microsoft -- and also large open source projects such as Babel, Jest, and React -- are all using the monorepo approach to software development.
+A lot of successful organizations such as Google, Facebook, and Microsoft--and also large open source projects such as Babel, Jest, and React--are all using the monorepo approach to software development.
 
 As you will see in this book, a monorepo approach when done correctly can save developers from a great deal of headache and wasted time.
 
 ## Why Nx?
 
-Nx is a set of dev tools designed specifically to help teams work with monorepos. It provides an opinionated organizational structure, and an opinionated set of generation, linting, and testing tools.
+Nx is a set of dev tools designed specifically to help teams work with monorepos. It provides an opinionated organizational structure, and a set of generation, linting, and testing tools.
 
 ## Is this book for you?
 
@@ -55,18 +56,30 @@ Consequently, this book might be for you if:
 On the other hand, this book might not be for you if:
 
 - You are already proficient at using Nx with React and this book may not teach you anything new.
-- You hate monorepos so much that you cannot stand looking at them.
+- You *hate* monorepos so much that you cannot stand looking at them.
+
+Okay, the last bullet point is a bit of a joke, but there are common concerns regarding monorepos in practice. 
+
+## Common concerns
+
+There are a few common concerns that folks may have when they consider using a monorepo.
+
+- Continuous integration (CI) is slow
+- Everyone can change my code
+- Lack of autonomy of each team
+
+All three of these issues will be addressed throughout this book.
 
 ## How this book is laid out
 
 This book is split into three parts.
 
-In **chapter 1** we begin by setting up the monorepo workspace with Nx and create our first application: An online bookstore. We will explore a few Nx commands that work right out of the box.
+In **chapter 1** we begin by setting up the monorepo workspace with Nx and create our first application--an online bookstore. We will explore a few Nx commands that work right out of the box.
 
 In **chapter 2** we build new libraries to support a book listing feature.
 
 In **chapter 3** we examine how Nx deals with code changes in the monorepo by arming us with intelligent tools to help us understand and verify changes. We will demonstrate these Nx tools by creating an `api` backend application.
 
-In **chapter 4** we wrap up our application by implementing the `shopping-cart` feature, where users can add book to their cart for checkout.
+In **chapter 4** we wrap up our application by implementing the `shopping-cart` feature, where users can add books to their cart for checkout.
 
 In **chapter 5** we will look at how we can create production bundles and deployment strategies.

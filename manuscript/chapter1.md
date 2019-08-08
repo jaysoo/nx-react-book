@@ -4,13 +4,13 @@
 Let's start by going through the terminology that Nx uses.
 
 **Workspace**
-: A folder created using Nx that consists of folders for applications and libraries, as well as scaffolding to help with building, linting, and testing.
+: A folder created using Nx that contain applications and libraries, as well as scaffolding to help with building, linting, and testing.
 
 **Project**
 : An application or library within the workspace.
   
 **Application**
-: A package consisting of multiple libraries that together create a runnable program. An application is usually either run in the browser or by Node.
+: A package that uses multiple libraries to form a runnable program. An application is usually either run in the browser or by Node.
 
 **Library**
 : A set of files that deal with related concerns. For example, a shared component UI library.
@@ -22,16 +22,16 @@ Now, let's create our workspace.
 You can create the workspace using `yarn` as follows:
 
 ```bash
-yarn create nx-workspace myorg
+yarn create nx-workspace
 ```
 
-I> The `myorg` argument passed to the command is our imaginary organization. This value is used to scope our libraries just like [npm scoped packages](https://docs.npmjs.com/misc/scope).
- 
-When prompted for a `preset`, choose the `react` option.
+Nx will ask you for a **workspace name**. Let's use `myorg` as it is the name of our imaginary organization. The workspace name is used by Nx to scope our libraries, just like [npm scoped packages](https://docs.npmjs.com/misc/scope).
+
+Next, you'll be prompted to select a **preset**--choose the `react` option.
 
 ![Creating a workspace](images/1-create-workspace.png)
 
-Next, you will be prompted for the application name and the styling format you want to use. Let's use `bookstore` as our application name, and `styled-components` for styling.
+Lastly, you'll be prompted for the application name and the styling format you want to use. Let's use `bookstore` as our application name and `styled-components` for styling.
 
 ![Choosing  a style option](images/1-choose-style.png)
 
@@ -44,7 +44,7 @@ I> --appName bookstore \
 I> --style styled-component`
 I> ```
 
-Once Nx finishes creating your workspace, you will end up with something like this:
+Once Nx finishes creating the workspace, we will end up with something like this:
 
 ```
 myorg
@@ -85,7 +85,7 @@ The `libs` folder will eventually contain our libraries (more on that in [Chapte
 
 The `tools` folder can be used for scripts that are specific to the workspace. The generated `tools/schematics` folder is for Nx's workspace schematics feature which we cover in [Appendix A](#appendix_a).
 
-The `nx.json` file configures the Nx tool (as we'll see in [Chapter 4](#chapter-4)).
+The `nx.json` file configures Nx (as we'll see in [Chapter 4](#chapter-4)).
 
 The `workspace.json` file configures our projects (applications and libraries) within the workspace. Here, you can specify what and how commands like `lint`, `test`, and `e2e` are run.
 
@@ -108,13 +108,13 @@ Nx comes with a set of targets that can be executed on our projects. You run a t
 For example, for our `bookstore` app we can run the following targets.
 
 ```bash
-# Run a linter (ESLint) for the application
+# Run a linter for the application
 yarn nx lint bookstore
 
-# Run unit tests (Jest) for the application
+# Run unit tests for the application
 yarn nx test bookstore
 
-# Run e2e tests (Cypress) for the application
+# Run e2e tests  for the application
 yarn nx e2e bookstore-e2e
 ```
 
@@ -154,7 +154,7 @@ Open up your favorite editor and modify these three files.
 
 **apps/bookstore/src/app/app.tsx**
 
-```tsx
+```javascript
 import React from 'react';
 import styled from 'styled-components';
 
@@ -175,7 +175,7 @@ export default App;
 
 **apps/bookstore/src/app/app.spec.tsx**
 
-```tsx
+```javascript
 import React from 'react';
 import { render, cleanup } from '@testing-library/react';
 
@@ -199,7 +199,7 @@ describe('App', () => {
 ```
 
 **apps/bookstore-e2e/src/integration/app.spec.ts**
-```tsx
+```javascript
 import { getGreeting } from '../support/app.po';
 
 describe('bookstore', () => {
@@ -213,8 +213,8 @@ describe('bookstore', () => {
 
 Make sure the tests still pass:
 
-- `yarn test bookstore`
-- `yarn e2e bookstore-e2e`
+- `nx test bookstore`
+- `nx e2e bookstore-e2e`
 
 Now, lets configure the workspace to use `styled-components`, so when we generate new components and libraries it will be the default.
 
