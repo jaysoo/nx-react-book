@@ -60,9 +60,9 @@ On the other hand, this book might not be for you if:
 
 Okay, the last bullet point is a bit of a joke, but there are common concerns regarding monorepos in practice. 
 
-## Common concerns
+## Common concerns regarding monorepos
 
-There are a few common concerns that folks may have when they consider using a monorepo.
+There are a few common concerns that people may have when they consider using a monorepo.
 
 - Continuous integration (CI) is slow
 - Everyone can change my code

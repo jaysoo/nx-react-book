@@ -58,7 +58,7 @@ myorg
 ├── (...)
 ├── libs
 │   ├── (...)
-markua-start-insert
+leanpub-start-insert
 │   └──books
 │       └── feature
 │           ├── src
@@ -70,7 +70,7 @@ markua-start-insert
 │           ├── tsconfig.app.json
 │           ├── tsconfig.json
 │           └── tsconfig.spec.json
-markua-end-insert
+leanpub-end-insert
 └── (...)
 ```
 
@@ -94,7 +94,7 @@ export const App = () => {
     <>
       <header>
         <h1>Welcome to the Bookstore!</h1>
-markua-start-insert
+leanpub-start-insert
         <div role="navigation">
           <ul>
             <li>
@@ -102,12 +102,12 @@ markua-start-insert
             </li>
           </ul>
         </div>
-markua-end-insert
+leanpub-end-insert
       </header>
-markua-start-insert
+leanpub-start-insert
       <Route path="/books" component={BooksFeature} />
       <Route exact path="/" render={() => <Redirect to="/books" />} />
-markua-end-insert
+leanpub-end-insert
     </>
   );
 };
@@ -120,20 +120,20 @@ Additionally, the `main.tsx` file for `bookstore` has also been updated to rende
 ```javascript
 import React from 'react';
 import ReactDOM from 'react-dom';
-markua-start-insert
+leanpub-start-insert
 import { BrowserRouter } from 'react-router-dom';
-markua-end-insert
+leanpub-end-insert
 
 import App from './app/app';
 
-markua-start-insert
+leanpub-start-insert
 ReactDOM.render(
   <BrowserRouter>
     <App />
   </BrowserRouter>,
   document.getElementById('root')
 );
-markua-end-insert
+leanpub-end-insert
 ```
 
 
@@ -177,7 +177,7 @@ myorg
 ├── (...)
 ├── libs
 │   ├── (...)
-markua-start-insert
+leanpub-start-insert
 │   ├── ui
 │   │   ├── src
 │   │   │   ├── lib
@@ -188,7 +188,7 @@ markua-start-insert
 │   │   ├── tsconfig.app.json
 │   │   ├── tsconfig.json
 │   │   └── tsconfig.spec.json
-markua-end-insert
+leanpub-end-insert
 └── (...)
 ```
 

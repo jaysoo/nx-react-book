@@ -28,15 +28,15 @@ We can update our `Book`, `Books`, and `BooksFeature` components to pass along a
 ```
 import React from 'react';
 import styled from 'styled-components';
-markua-start-insert
+leanpub-start-insert
 import { Button } from '@myorg/ui';
-markua-end-insert
+leanpub-end-insert
 
 export interface BookProps {
   book: any;
-markua-start-insert
+leanpub-start-insert
   onAdd: (book: any) => void;
-markua-end-insert
+leanpub-end-insert
 }
 
 const StyledBook = styled.div`
@@ -69,11 +69,11 @@ export const Book = ({ book, onAdd }: BookProps) => {
       </span>
       <span className="rating">{book.rating}</span>
       <span className="price">${book.price}</span>
-markua-start-insert
+leanpub-start-insert
       <span>
         <Button onClick={() => onAdd(book)}>Add to Cart</Button>
       </span>
-markua-end-insert
+leanpub-end-insert
     </StyledBook>
   );
 };
@@ -90,9 +90,9 @@ import { Book } from '../book/book';
 
 export interface BooksProps {
   books: any[];
-markua-start-insert
+leanpub-start-insert
   onAdd: (book: any) => void;
-markua-end-insert
+leanpub-end-insert
 }
 
 const StyledBooks = styled.div`
@@ -100,15 +100,15 @@ const StyledBooks = styled.div`
   border-radius: 4px;
 `;
 
-markua-start-insert
+leanpub-start-insert
 export const Books = ({ books, onAdd }: BooksProps) => {
-markua-end-insert
+leanpub-end-insert
   return (
     <StyledBooks>
       {books.map(book => (
-markua-start-insert
+leanpub-start-insert
         <Book key={book.id} book={book} onAdd={onAdd} />
-markua-end-insert
+leanpub-end-insert
       ))}
     </StyledBooks>
   );
@@ -138,9 +138,9 @@ export const BooksFeature = () => {
   return (
     <>
       <h2>Books</h2>
-markua-start-insert
+leanpub-start-insert
       <Books books={books} onAdd={book => alert(`Added ${book.title}`)} />
-markua-end-insert
+leanpub-end-insert
     </>
   );
 };
@@ -249,21 +249,21 @@ Now, we can add our new handler to the API application.
 
 ```typescript
 import * as express from 'express';
-markua-start-insert
+leanpub-start-insert
 import * as cors from 'cors';
-markua-end-insert
+leanpub-end-insert
 
 const app = express();
 
-markua-start-insert
+leanpub-start-insert
 app.use(cors());
-markua-end-insert
+leanpub-end-insert
 
 app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to api!' });
 });
 
-markua-start-insert
+leanpub-start-insert
 app.get('/api/books', (req, res) => {
   const books: any[] = [
     {
@@ -304,7 +304,7 @@ app.get('/api/books', (req, res) => {
   ];
   res.send(books);
 });
-markua-end-insert
+leanpub-end-insert
 
 const port = process.env.port || 3333;
 const server = app.listen(port, () => {
@@ -362,9 +362,9 @@ And now we can update the following five files to use the new model:
 ...
 
 app.get('/api/books', (req, res) => {
-markua-start-insert
+leanpub-start-insert
   const products: IBook[] = [
-markua-end-insert
+leanpub-end-insert
     ...
   ];
   res.send(products);
@@ -376,13 +376,13 @@ markua-end-insert
 **libs/products/data-access/src/lib/products-data-access.ts**
 
 ```javascript
-markua-start-insert
+leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
-markua-end-insert
+leanpub-end-insert
 
-markua-start-insert
+leanpub-start-insert
 export async function getBooks(): Promise<IBook[]> {
-markua-end-insert
+leanpub-end-insert
   const data = await fetch('http://localhost:3333/api/books');
   return data.json();
 }
@@ -393,14 +393,14 @@ markua-end-insert
 
 ```javascript
 ...
-markua-start-insert
+leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
-markua-end-insert
+leanpub-end-insert
 
 export const BooksFeature = () => {
-markua-start-insert
+leanpub-start-insert
   const [books, setBooks] = useState([] as IBook[]);
-markua-end-insert
+leanpub-end-insert
 
   ...
 
@@ -419,16 +419,16 @@ export default BooksFeature;
 
 ```javascript
 ...
-markua-start-insert
+leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
-markua-end-insert
+leanpub-end-insert
 
 
 export interface BooksProps {
-markua-start-insert
+leanpub-start-insert
   books: IBook[];
   onAdd: (book: IBook) => void;
-markua-end-insert
+leanpub-end-insert
 }
 
 ...
@@ -440,15 +440,15 @@ export default Books;
 
 ```javascript
 ...
-markua-start-insert
+leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
-markua-end-insert
+leanpub-end-insert
 
 export interface BookProps {
-markua-start-insert
+leanpub-start-insert
   book: IBook;
   onAdd: (book: IBook) => void;
-markua-end-insert
+leanpub-end-insert
 }
 
 ...
