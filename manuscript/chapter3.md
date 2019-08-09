@@ -215,7 +215,10 @@ yarn --dev @nrwl/express
 Then we can do a dry run of the generate command.
 
 ```bash
-nx g @nrwl/express:app api --no-interactive --dry-run
+nx g @nrwl/express:app api \
+--no-interactive \
+--frontend-project=bookstore \
+--dry-run
 ```
 
 ![Preview of the file changes](images/3-api-dry-run.png)
@@ -223,24 +226,27 @@ nx g @nrwl/express:app api --no-interactive --dry-run
 Everything looks good so let's run it for real.
 
 ```bash
-nx g @nrwl/express:app api --no-interactive
+nx g @nrwl/express:app api \
+--no-interactive \
+--frontend-project=bookstore \
 ```
 
-Just like our frontend application, we can use Nx to serve the API.
+The `--frontend-project` option will add proxy configuration to the `bookstore` application such that requests going to `/api/*` will be forwarded to the API
+
+And just like our frontend application, we can use Nx to serve the API.
 
 ```bash
 nx serve api
 ```
 
-And when we open up `http://localhost:3333/api` we'll be greeted by a nice message.
+When we open up `http://localhost:3333/api` we'll be greeted by a nice message.
 
 ```json
 
 { "message": "Welcome to api!" }
 ```
 
-Next, let's add the `/api/books` endpoint so that we can use it in our `books-data-access` library.
-
+Next, let's implement the `/api/books` endpoint so that we can use it in our `books-data-access` library.
 
 **apps/api/src/main.ts**
 
@@ -303,55 +309,7 @@ const server = app.listen(port, () => {
 server.on('error', console.error);
 ```
 
-We should also set up a proxy from `http://localhost:4200/api` (bookstore) to `http://localhost:3333` (API). This way we can use `/api/*` from the `bookstore` application and the request will be proxied to our new API server.
-
-To set up the proxy, add the following configuration to the `bookstore` application.
-
-**apps/bookstore/proxy.conf.json**
-
-```json
-{
-  "/api": {
-    "target": "http://localhost:3333",
-    "secure": false
-  }
-}
-```
-
-And then open up `workspace.json` and edit the `serve` architect for `bookstore`.
-
-```json
-{
-  "version": 1,
-  "projects": {
-    "bookstore": {
-      (...)
-      "architect": {
-        (...)
-        "serve": {
-          "builder": "@nrwl/web:dev-server",
-          "options": {
-            "buildTarget": "bookstore:build",
-leanpub-start-insert
-            "proxyConfig": "apps/bookstore/proxy.conf.json"
-leanpub-end-insert
-          },
-          "configurations": {
-            "production": {
-              "buildTarget": "bookstore:build:production"
-            }
-          }
-        },
-        (...)
-      }
-    },
-    (...)
-  }
-  (...)
-}
-```
-
-Lastly, let's update our data-access library to call the proxied endpoint.
+Finally, let's update our data-access library to call the proxied endpoint.
 
 **libs/books/data-access/src/lib/books-data-access.ts**
 
@@ -366,7 +324,7 @@ export async function getBooks() {
 }
 ```
 
-If we restart both applications--`nx serve api` and `nx serve bookstore`--we'll see that our [bookstore](http://localhost:4200) is still working in the browser. Moreover, we can verify that our `/api/books` endpoint is indeed being called.
+If we restart both applications (`nx serve api` and `nx serve bookstore`) we'll see that our [bookstore](http://localhost:4200) is still working in the browser. Moreover, we can verify that our `/api/books` endpoint is indeed being called.
 
 ![](images/3-api-verify.png)
 
