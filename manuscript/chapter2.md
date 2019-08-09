@@ -83,7 +83,7 @@ nx test books-feature
 
 You'll also see that the `App` component for `bookstore` has been updated to include the new route.
 
-```javascript
+```typescript
 import React from 'react';
 import { Link, Redirect, Route } from 'react-router-dom';
 
@@ -117,7 +117,7 @@ export default App;
 
 Additionally, the `main.tsx` file for `bookstore` has also been updated to render `<BrowserRouter />`. This render is needed in order for `<Route />` components to work, and Nx will handle the file update for us if necessary.
 
-```javascript
+```typescript
 import React from 'react';
 import ReactDOM from 'react-dom';
 leanpub-start-insert
@@ -219,7 +219,7 @@ This component is useful for overriding global style rules such as `body { margi
 
 **libs/ui/src/lib/global-styles/global-styles.tsx**
 
-```javascript
+```typescript
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
@@ -244,7 +244,7 @@ This component is pretty self-explanatory. It renders a styled button and passes
 
 **libs/ui/src/lib/button/button.tsx**
 
-```javascript
+```typescript
 import React, { ButtonHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -277,7 +277,7 @@ These two components are used for layout. The header component forms the top hea
 
 **libs/ui/src/lib/header/header.tsx**
 
-```javascript
+```typescript
 import React, { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -313,7 +313,7 @@ export default Header;
 
 **libs/ui/src/lib/main/main.tsx**
 
-```javascript
+```typescript
 import React, { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -336,7 +336,7 @@ And finally, the `NavigationList` and `NavigationItem` components will render th
 
 **libs/ui/src/lib/navigation-list/navigation-list.tsx**
 
-```javascript
+```typescript
 import React, { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -361,7 +361,7 @@ export default NavigationList;
 
 **libs/ui/src/lib/navigation-item/navigation-item.tsx**
 
-```javascript
+```typescript
 import React, { LiHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -382,7 +382,7 @@ Now we can use the new library in our `bookstore`'s app component.
 
 **apps/bookstore/src/app/app.tsx**
 
-```javascript
+```typescript
 import React from 'react';
 import { Link, Redirect, Route } from 'react-router-dom';
 
@@ -509,7 +509,7 @@ The next step is to use the `getBooks` function within our `books` feature. We c
 
 **libs/books/feature/src/lib/books-feature/books-feature.tsx**
 
-```javascript
+```typescript
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@myorg/bookss/data-access';
@@ -550,7 +550,7 @@ Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
  
 **libs/books/ui/src/lib/books/books.tsx**
 
-```javascript
+```typescript
 import React from 'react';
 import styled from 'styled-components';
 import { Book } from '../book/book';
@@ -579,7 +579,7 @@ export default Books;
 
 **libs/books/ui/src/lib/book/book.tsx**
 
-```javascript
+```typescript
 import React from 'react';
 import styled from 'styled-components';
 import { Button } from '@myorg/ui';

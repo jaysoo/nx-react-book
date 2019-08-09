@@ -83,7 +83,7 @@ export default Book;
 
 **libs/books/ui/src/lib/books/books.tsx**
 
-```javascript
+```typescript
 import React from 'react';
 import styled from 'styled-components';
 import { Book } from '../book/book';
@@ -119,7 +119,7 @@ export default Books;
 
 **libs/books/feature/src/lib/books-feature/books-feature.tsx**
 
-```javascript
+```typescript
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@myorg/bookss/data-access';
@@ -239,25 +239,15 @@ And when we open up `http://localhost:3333/api` we'll be greeted by a nice messa
 { "message": "Welcome to api!" }
 ```
 
-Next, let's add the `/api/books` endpoint so that we can use this in our `books-data-access` library. But first, we need to add CORS support to our API because it is running on a different port.
+Next, let's add the `/api/books` endpoint so that we can use it in our `books-data-access` library.
 
-```bash
-npm install cors
-```
 
-Now, we can add our new handler to the API application.
+**apps/api/src/main.ts**
 
 ```typescript
 import * as express from 'express';
-leanpub-start-insert
-import * as cors from 'cors';
-leanpub-end-insert
 
 const app = express();
-
-leanpub-start-insert
-app.use(cors());
-leanpub-end-insert
 
 app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to api!' });
@@ -313,13 +303,61 @@ const server = app.listen(port, () => {
 server.on('error', console.error);
 ```
 
-And then update the data-access library to call this new endpoint.
+We should also set up a proxy from `http://localhost:4200/api` (bookstore) to `http://localhost:3333` (API). This way we can use `/api/*` from the `bookstore` application and the request will be proxied to our new API server.
+
+To set up the proxy, add the following configuration to the `bookstore` application.
+
+**apps/bookstore/proxy.conf.json**
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:3333",
+    "secure": false
+  }
+}
+```
+
+And then open up `workspace.json` and edit the `serve` architect for `bookstore`.
+
+```json
+{
+  "version": 1,
+  "projects": {
+    "bookstore": {
+      (...)
+      "architect": {
+        (...)
+        "serve": {
+          "builder": "@nrwl/web:dev-server",
+          "options": {
+            "buildTarget": "bookstore:build",
+leanpub-start-insert
+            "proxyConfig": "apps/bookstore/proxy.conf.json"
+leanpub-end-insert
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "bookstore:build:production"
+            }
+          }
+        },
+        (...)
+      }
+    },
+    (...)
+  }
+  (...)
+}
+```
+
+Lastly, let's update our data-access library to call the proxied endpoint.
 
 **libs/books/data-access/src/lib/books-data-access.ts**
 
 ```typescript
 export async function getBooks() {
-  const data = await fetch('http://localhost:3333/api/books', {
+  const data = await fetch('/api/books', {
     headers: {
       'Content-Type': 'application/json'
     }
@@ -328,13 +366,13 @@ export async function getBooks() {
 }
 ```
 
-If we restart both applications--`nx serve api` and `nx serve bookstore`--we'll see that our [bookstore](http://localhost:4200) still loads in the browser. And we can also verify that our `/api/books` endpoint is indeed being called.
+If we restart both applications--`nx serve api` and `nx serve bookstore`--we'll see that our [bookstore](http://localhost:4200) is still working in the browser. Moreover, we can verify that our `/api/books` endpoint is indeed being called.
 
 ![](images/3-api-verify.png)
 
 ### Sharing models between frontend and backend
 
-Recall that we previously used the `any` type when working with books data. This is a bad practice as it may lead to uncaught type errors in the future.
+Recall that we previously used the `any` type when working with books data. This is bad practice as it may lead to uncaught type errors in production.
 
 A better idea would be to create a utility library containing some shared models to be used by both the frontend and backend.
 
@@ -344,7 +382,7 @@ nx g @nrwl/node:lib shared-models --no-interactive
 
 **libs/shared-models/src/lib/shared-models.ts**
 
-```javascript
+```typescript
 export interface IBook {
   id: number;
   title: string;
@@ -375,7 +413,7 @@ leanpub-end-insert
 
 **libs/products/data-access/src/lib/products-data-access.ts**
 
-```javascript
+```typescript
 leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
 leanpub-end-insert
@@ -391,7 +429,7 @@ leanpub-end-insert
 
 **libs/books/feature/src/lib/books-feature/books-feature.tsx**
 
-```javascript
+```typescript
 ...
 leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
@@ -417,7 +455,7 @@ export default BooksFeature;
 
 **libs/products/ui/src/lib/books/books.tsx**
 
-```javascript
+```typescript
 ...
 leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
@@ -438,7 +476,7 @@ export default Books;
 
 **libs/products/ui/src/lib/book/book.tsx**
 
-```javascript
+```typescript
 ...
 leanpub-start-insert
 import { IBook } from '@myorg/shared-models';

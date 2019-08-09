@@ -154,7 +154,7 @@ Open up your favorite editor and modify these three files.
 
 **apps/bookstore/src/app/app.tsx**
 
-```javascript
+```typescript
 import React from 'react';
 import styled from 'styled-components';
 
@@ -175,7 +175,7 @@ export default App;
 
 **apps/bookstore/src/app/app.spec.tsx**
 
-```javascript
+```typescript
 import React from 'react';
 import { render, cleanup } from '@testing-library/react';
 
@@ -199,7 +199,8 @@ describe('App', () => {
 ```
 
 **apps/bookstore-e2e/src/integration/app.spec.ts**
-```javascript
+
+```typescript
 import { getGreeting } from '../support/app.po';
 
 describe('bookstore', () => {
