@@ -58,7 +58,6 @@ myorg
 ├── (...)
 ├── libs
 │   ├── (...)
-leanpub-start-insert
 │   └──books
 │       └── feature
 │           ├── src
@@ -70,7 +69,6 @@ leanpub-start-insert
 │           ├── tsconfig.app.json
 │           ├── tsconfig.json
 │           └── tsconfig.spec.json
-leanpub-end-insert
 └── (...)
 ```
 
@@ -94,7 +92,6 @@ export const App = () => {
     <>
       <header>
         <h1>Welcome to the Bookstore!</h1>
-leanpub-start-insert
         <div role="navigation">
           <ul>
             <li>
@@ -102,12 +99,9 @@ leanpub-start-insert
             </li>
           </ul>
         </div>
-leanpub-end-insert
       </header>
-leanpub-start-insert
       <Route path="/books" component={BooksFeature} />
       <Route exact path="/" render={() => <Redirect to="/books" />} />
-leanpub-end-insert
     </>
   );
 };
@@ -120,20 +114,16 @@ Additionally, the `main.tsx` file for `bookstore` has also been updated to rende
 ```typescript
 import React from 'react';
 import ReactDOM from 'react-dom';
-leanpub-start-insert
 import { BrowserRouter } from 'react-router-dom';
-leanpub-end-insert
 
 import App from './app/app';
 
-leanpub-start-insert
 ReactDOM.render(
   <BrowserRouter>
     <App />
   </BrowserRouter>,
   document.getElementById('root')
 );
-leanpub-end-insert
 ```
 
 
@@ -177,7 +167,6 @@ myorg
 ├── (...)
 ├── libs
 │   ├── (...)
-leanpub-start-insert
 │   ├── ui
 │   │   ├── src
 │   │   │   ├── lib
@@ -188,7 +177,6 @@ leanpub-start-insert
 │   │   ├── tsconfig.app.json
 │   │   ├── tsconfig.json
 │   │   └── tsconfig.spec.json
-leanpub-end-insert
 └── (...)
 ```
 

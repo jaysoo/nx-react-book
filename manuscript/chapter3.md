@@ -28,15 +28,12 @@ We can update our `Book`, `Books`, and `BooksFeature` components to pass along a
 ```
 import React from 'react';
 import styled from 'styled-components';
-leanpub-start-insert
 import { Button } from '@myorg/ui';
-leanpub-end-insert
 
 export interface BookProps {
   book: any;
-leanpub-start-insert
+  // New prop
   onAdd: (book: any) => void;
-leanpub-end-insert
 }
 
 const StyledBook = styled.div`
@@ -69,11 +66,10 @@ export const Book = ({ book, onAdd }: BookProps) => {
       </span>
       <span className="rating">{book.rating}</span>
       <span className="price">${book.price}</span>
-leanpub-start-insert
+      {/* Add button to UI */}
       <span>
         <Button onClick={() => onAdd(book)}>Add to Cart</Button>
       </span>
-leanpub-end-insert
     </StyledBook>
   );
 };
@@ -90,9 +86,8 @@ import { Book } from '../book/book';
 
 export interface BooksProps {
   books: any[];
-leanpub-start-insert
+ // New prop
   onAdd: (book: any) => void;
-leanpub-end-insert
 }
 
 const StyledBooks = styled.div`
@@ -100,15 +95,12 @@ const StyledBooks = styled.div`
   border-radius: 4px;
 `;
 
-leanpub-start-insert
 export const Books = ({ books, onAdd }: BooksProps) => {
-leanpub-end-insert
   return (
     <StyledBooks>
       {books.map(book => (
-leanpub-start-insert
+        {/* Pass down new callback prop */}
         <Book key={book.id} book={book} onAdd={onAdd} />
-leanpub-end-insert
       ))}
     </StyledBooks>
   );
@@ -138,9 +130,9 @@ export const BooksFeature = () => {
   return (
     <>
       <h2>Books</h2>
-leanpub-start-insert
+      {/* Pass a stub callback for now */}
+      {/* We'll implement this properly in Chapter 4 */}
       <Books books={books} onAdd={book => alert(`Added ${book.title}`)} />
-leanpub-end-insert
     </>
   );
 };
@@ -259,7 +251,6 @@ app.get('/api', (req, res) => {
   res.send({ message: 'Welcome to api!' });
 });
 
-leanpub-start-insert
 app.get('/api/books', (req, res) => {
   const books: any[] = [
     {
@@ -300,7 +291,6 @@ app.get('/api/books', (req, res) => {
   ];
   res.send(books);
 });
-leanpub-end-insert
 
 const port = process.env.port || 3333;
 const server = app.listen(port, () => {
@@ -355,30 +345,25 @@ And now we can update the following five files to use the new model:
 **apps/api/src/main.ts**
 
 ```typescript
-...
+// ...
 
 app.get('/api/books', (req, res) => {
-leanpub-start-insert
   const products: IBook[] = [
-leanpub-end-insert
-    ...
+    // ...
   ];
   res.send(products);
 });
 
-...
+// ...
 ```
 
 **libs/products/data-access/src/lib/products-data-access.ts**
 
 ```typescript
-leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
-leanpub-end-insert
 
-leanpub-start-insert
+// Add correct type for the return value
 export async function getBooks(): Promise<IBook[]> {
-leanpub-end-insert
   const data = await fetch('http://localhost:3333/api/books');
   return data.json();
 }
@@ -389,16 +374,13 @@ leanpub-end-insert
 
 ```typescript
 ...
-leanpub-start-insert
 import { IBook } from '@myorg/shared-models';
-leanpub-end-insert
 
 export const BooksFeature = () => {
-leanpub-start-insert
+  // Replace any with IBook
   const [books, setBooks] = useState([] as IBook[]);
-leanpub-end-insert
 
-  ...
+  // ...
 
   return (
     <>
@@ -414,20 +396,16 @@ export default BooksFeature;
 **libs/products/ui/src/lib/books/books.tsx**
 
 ```typescript
-...
-leanpub-start-insert
+// ...
 import { IBook } from '@myorg/shared-models';
-leanpub-end-insert
 
-
+// Replace any with IBook
 export interface BooksProps {
-leanpub-start-insert
   books: IBook[];
   onAdd: (book: IBook) => void;
-leanpub-end-insert
 }
 
-...
+// ...
 
 export default Books;
 ```
@@ -435,19 +413,16 @@ export default Books;
 **libs/products/ui/src/lib/book/book.tsx**
 
 ```typescript
-...
-leanpub-start-insert
+// ...
 import { IBook } from '@myorg/shared-models';
-leanpub-end-insert
 
+// Replace any with IBook
 export interface BookProps {
-leanpub-start-insert
   book: IBook;
   onAdd: (book: IBook) => void;
-leanpub-end-insert
 }
 
-...
+// ...
 
 export default Book;
 ```
