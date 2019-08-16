@@ -1,4 +1,4 @@
-{id: chapter-2}
+{#chapter-2}
 # Chapter 2: Libraries
 
 We have the skeleton of our application from [Chapter 1](#chapter-1).
@@ -38,18 +38,18 @@ Let's create our first feature library: `books`.
 ```bash
 nx g lib feature \
 --directory books \
---parent-route apps/bookstore/src/app/app.tsx
+--appProject bookstore
 ```
 
-The `--directory` option allows us to group our libraries by nesting them under their parent directory. In this case the library is created in the `libs/books/feature` folder.
+The `--directory` option allows us to group our libraries by nesting them under their parent directory. In this case the library is created in the `libs/books/feature` folder. It is aliased to `-d`.
 
-The `--parent-route` option lets Nx know that we want to make our feature library to be routable inside the *parent component*. This option is not needed, but it is useful because Nx will do three things for us.
+The `--appProject` option lets Nx know that we want to make our feature library to be routable inside the specified application. This option is not needed, but it is useful because Nx will do three things for us. It is aliased to `-a`.
 
 1. Update `apps/bookstore/src/app/app.tsx` with the new route.
 2. Update `apps/bookstore/src/main.tsx` to add `BrowserRouter` if it does not exist yet.
 3. Add [`react-router-dom`](https://reacttraining.com/react-router/web/guides/quick-start) and related dependencies to the workspace, if necessary.
 
-I> **Pro-tip:** You can pass the `--dry-run` option to `generate` to see the effects of the command before committing to disk.
+I> **Pro-tip:** You can pass the `--dryRun` option to `generate` to see the effects of the command before committing to disk.
 
 Once the command completes, you should see the new directory.
 
@@ -127,11 +127,11 @@ ReactDOM.render(
 ```
 
 
-Restart the development server by running `nx serve bookstore` again and you should see the updated application.
+Restart the development server again (`nx serve bookstore`) and you should see the updated application.
 
 I> Be aware that when you add a new project to the workspace, you must restart your development server. This restart is necessary in order for the TypeScript compiler to pick up new library paths, such as `@myorg/books/feature`.
 
-By using a monorepo, we've' *skipped* a few steps that are usually required when creating a new library.
+By using a monorepo, we've *skipped* a few steps that are usually required when creating a new library.
 
 - Setting up the repo
 - Setting up the CI
@@ -141,7 +141,7 @@ And now we have our library! Wasn't that easy? Something that may have taken min
 
 ***
 
-To our despair, when we navigate to <http://localhost:4200> again, we see a poorly styled application.
+*But* to our despair, when we navigate to <http://localhost:4200> again, we see a poorly styled application.
 
 ![](images/2-books-feature.png)
 
@@ -191,11 +191,13 @@ nx g component NavigationList --project ui --export
 nx g component NavigationItem --project ui --export
 ```
 
-The `--project` option specifies which project (as found in the `projects` section of `workspace.json`) to add the new component to.
+The `--project` option specifies which project (as found in the `projects` section of `workspace.json`) to add the new component to. It is aliased to `-p`.
 
-The `--export` option tells Nx to export the new component in the `index.ts` file of the project so that it can be imported elsewhere in the workspace. You may leave this option off if you are generating private/internal components.
+The `--export` option tells Nx to export the new component in the `index.ts` file of the project so that it can be imported elsewhere in the workspace. You may leave this option off if you are generating private/internal components. It is aliased to `-e`.
 
 If you do forget the `--export` option you can always manually add the export to `index.ts`.
+
+I> **Pro-tip:** You can use `nx g c` as an alias to `nx g component`--along with other aliases. For example, `nx g c Footer -p ui -e`. To see other options that you can use, run `ng g c --help`. 
 
 Next, let's go over the implementation of each of the components and what their purposes are.
 
@@ -205,7 +207,7 @@ This component injects a global stylesheet into our application when used.
 
 This component is useful for overriding global style rules such as `body { margin: 0 }`.
 
-**libs/ui/src/lib/global-styles/global-styles.tsx**
+**libs/ui/src/lib/global-styles.tsx**
 
 ```typescript
 import React from 'react';
@@ -230,7 +232,7 @@ export default GlobalStyles;
 
 This component is pretty self-explanatory. It renders a styled button and passes through other props to the actual `<button>`.
 
-**libs/ui/src/lib/button/button.tsx**
+**libs/ui/src/lib/button.tsx**
 
 ```typescript
 import React, { ButtonHTMLAttributes } from 'react';
@@ -263,7 +265,7 @@ export default Button;
 
 These two components are used for layout. The header component forms the top header bar, while the main component takes up the rest of the page.
 
-**libs/ui/src/lib/header/header.tsx**
+**libs/ui/src/lib/header.tsx**
 
 ```typescript
 import React, { HTMLAttributes } from 'react';
@@ -299,7 +301,7 @@ export const Header = (props: HTMLAttributes<HTMLElement>) => (
 export default Header;
 ```
 
-**libs/ui/src/lib/main/main.tsx**
+**libs/ui/src/lib/main.tsx**
 
 ```typescript
 import React, { HTMLAttributes } from 'react';
@@ -322,7 +324,7 @@ export default Main;
 
 And finally, the `NavigationList` and `NavigationItem` components will render the navigation bar inside our top `Header` component.
 
-**libs/ui/src/lib/navigation-list/navigation-list.tsx**
+**libs/ui/src/lib/navigation-list.tsx**
 
 ```typescript
 import React, { HTMLAttributes } from 'react';
@@ -348,7 +350,7 @@ export const NavigationList = (props: HTMLAttributes<HTMLElement>) => {
 export default NavigationList;
 ```
 
-**libs/ui/src/lib/navigation-item/navigation-item.tsx**
+**libs/ui/src/lib/navigation-item.tsx**
 
 ```typescript
 import React, { LiHTMLAttributes } from 'react';
@@ -496,7 +498,7 @@ export async function getBooks() {
 
 The next step is to use the `getBooks` function within our `books` feature. We can do this with React's `useEffect` and `useState` hooks.
 
-**libs/books/feature/src/lib/books-feature/books-feature.tsx**
+**libs/books/feature/src/lib/books-feature.tsx**
 
 ```typescript
 import React, { useEffect, useState } from 'react';
@@ -537,7 +539,7 @@ We generally want to put *presentational* components into their own UI library. 
 
 Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
  
-**libs/books/ui/src/lib/books/books.tsx**
+**libs/books/ui/src/lib/books.tsx**
 
 ```typescript
 import React from 'react';
@@ -566,7 +568,7 @@ export const Books = ({ books }: BooksProps) => {
 export default Books;
 ```
 
-**libs/books/ui/src/lib/book/book.tsx**
+**libs/books/ui/src/lib/book.tsx**
 
 ```typescript
 import React from 'react';

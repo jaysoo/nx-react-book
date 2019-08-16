@@ -70,6 +70,10 @@ There are a few common concerns that people may have when they consider using a 
 
 All three of these issues will be addressed throughout this book.
 
+## Assumption: You are using `yarn`
+
+This book assumes that you are using using `yarn` as your package manager. If you are using `npm` instead, please read [Append B](#appendix-b) for how to follow this book using that. 
+
 ## How this book is laid out
 
 This book is split into three parts.

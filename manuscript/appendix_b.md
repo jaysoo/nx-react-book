@@ -1,4 +1,4 @@
-{id: appendix-b}
+{#appendix-b}
 # Appendix B: Using `npm` instead of `yarn`
 
 (TODO: Add content)

@@ -1,4 +1,4 @@
-{id: chapter-1}
+{#chapter-1}
 # Chapter 1: Getting started
 
 Let's start by going through the terminology that Nx uses.
@@ -34,15 +34,6 @@ Next, you'll be prompted to select a **preset**--choose the `react` option.
 Lastly, you'll be prompted for the application name and the styling format you want to use. Let's use `bookstore` as our application name and `styled-components` for styling.
 
 ![Choosing  a style option](images/1-choose-style.png)
-
-I> You can create the same workspace without prompts by providing them as options: 
-I>
-I> ```bash
-I> yarn create nx-workspace myorg \
-I> --preset react \
-I> --appName bookstore \
-I> --style styled-component`
-I> ```
 
 Once Nx finishes creating the workspace, we will end up with something like this:
 

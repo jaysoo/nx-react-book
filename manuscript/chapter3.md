@@ -1,4 +1,4 @@
-{id: chapter-3}
+{#chapter-3}
 # Chapter 3: Working effectively in a monorepo
 
 In the previous two chapters we set up a `bookstore` application that renders a list of books for users to purchase.
@@ -23,7 +23,7 @@ Let's say we want to add a **checkout** button to each of the books in the list.
 
 We can update our `Book`, `Books`, and `BooksFeature` components to pass along a new `onAdd` callback prop.
 
-**libs/books/ui/src/lib/book/book.tsx**
+**libs/books/ui/src/lib/book.tsx**
 
 ```
 import React from 'react';
@@ -77,7 +77,7 @@ export const Book = ({ book, onAdd }: BookProps) => {
 export default Book;
 ```
 
-**libs/books/ui/src/lib/books/books.tsx**
+**libs/books/ui/src/lib/books.tsx**
 
 ```typescript
 import React from 'react';
@@ -109,7 +109,7 @@ export const Books = ({ books, onAdd }: BooksProps) => {
 export default Books;
 ```
 
-**libs/books/feature/src/lib/books-feature/books-feature.tsx**
+**libs/books/feature/src/lib/books-feature.tsx**
 
 ```typescript
 import React, { useEffect, useState } from 'react';
@@ -165,7 +165,7 @@ nx affected:test --parallel
 Or even run **e2e tests** for the affected projects.
 
 ```bash
-nx affected:e2e --parallel
+nx affected:e2e
 ```
 
 Nx topologically sorts the projects so they are run from bottom to top. That is, projects at the bottom of the dependency chain are run first. We're also using the `--parallel` option to enable Nx to run our projects in parallel.
@@ -201,7 +201,7 @@ So far our `bookstore` application does not communicate with a real backend serv
 We'll need to install the `@nrwl/express` collection first.
 
 ```bash
-yarn --dev @nrwl/express
+yarn add --dev @nrwl/express
 ```
 
 Then we can do a dry run of the generate command.
@@ -210,7 +210,7 @@ Then we can do a dry run of the generate command.
 nx g @nrwl/express:app api \
 --no-interactive \
 --frontend-project=bookstore \
---dry-run
+--dryRun
 ```
 
 ![Preview of the file changes](images/3-api-dry-run.png)
@@ -220,7 +220,7 @@ Everything looks good so let's run it for real.
 ```bash
 nx g @nrwl/express:app api \
 --no-interactive \
---frontend-project=bookstore \
+--frontend-project=bookstore
 ```
 
 The `--frontend-project` option will add proxy configuration to the `bookstore` application such that requests going to `/api/*` will be forwarded to the API
@@ -370,7 +370,7 @@ export async function getBooks(): Promise<IBook[]> {
 
 ```
 
-**libs/books/feature/src/lib/books-feature/books-feature.tsx**
+**libs/books/feature/src/lib/books-feature.tsx**
 
 ```typescript
 ...
@@ -393,7 +393,7 @@ export const BooksFeature = () => {
 export default BooksFeature;
 ```
 
-**libs/products/ui/src/lib/books/books.tsx**
+**libs/products/ui/src/lib/books.tsx**
 
 ```typescript
 // ...
@@ -410,7 +410,7 @@ export interface BooksProps {
 export default Books;
 ```
 
-**libs/products/ui/src/lib/book/book.tsx**
+**libs/products/ui/src/lib/book.tsx**
 
 ```typescript
 // ...
@@ -474,4 +474,4 @@ T>
 T> Nx allows us to strictly enforce library project boundaries. 
 T>
 T> Nx automatically formats our code for us in an opinionated way using Prettier.
-  
+
