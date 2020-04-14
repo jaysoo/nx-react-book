@@ -83,26 +83,61 @@ You'll also see that the `App` component for `bookstore` has been updated to inc
 
 ```typescript
 import React from 'react';
-import { Link, Redirect, Route } from 'react-router-dom';
+import styled from 'styled-components';
+import { Route, Link } from 'react-router-dom';
 
 import { BooksFeature } from '@myorg/books/feature';
 
+const StyledApp = styled.div``;
+
 export const App = () => {
   return (
-    <>
+    <StyledApp>
       <header>
-        <h1>Welcome to the Bookstore!</h1>
-        <div role="navigation">
-          <ul>
-            <li>
-              <Link to="/books">Books</Link>
-            </li>
-          </ul>
-        </div>
+        <h1>Bookstore</h1>
       </header>
-      <Route path="/books" component={BooksFeature} />
-      <Route exact path="/" render={() => <Redirect to="/books" />} />
-    </>
+
+      {/* START: routes */}
+      {/* These routes and navigation have been generated for you */}
+      {/* Feel free to move and update them to fit your needs */}
+      <br />
+      <hr />
+      <br />
+      <div role="navigation">
+        <ul>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/feature">BooksFeature</Link>
+          </li>
+          <li>
+            <Link to="/page-2">Page 2</Link>
+          </li>
+        </ul>
+      </div>
+      <Route
+        path="/"
+        exact
+        render={() => (
+          <div>
+            This is the generated root route.{' '}
+            <Link to="/page-2">Click here for page 2.</Link>
+          </div>
+        )}
+      />
+      <Route path="/feature" component={BooksFeature} />
+      <Route
+        path="/page-2"
+        exact
+        render={() => (
+          <div>
+            <Link to="/">Click here to go back to root page.</Link>
+          </div>
+        )}
+      />
+      {/* END: routes */}
+    </StyledApp>
   );
 };
 
@@ -114,9 +149,9 @@ Additionally, the `main.tsx` file for `bookstore` has also been updated to rende
 ```typescript
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
-
 import App from './app/app';
+
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
   <BrowserRouter>
@@ -125,7 +160,6 @@ ReactDOM.render(
   document.getElementById('root')
 );
 ```
-
 
 Restart the development server again (`nx serve bookstore`) and you should see the updated application.
 
@@ -197,7 +231,7 @@ The `--export` option tells Nx to export the new component in the `index.ts` fil
 
 If you do forget the `--export` option you can always manually add the export to `index.ts`.
 
-I> **Pro-tip:** You can use `nx g c` as an alias to `nx g component`--along with other aliases. For example, `nx g c Footer -p ui -e`. To see other options that you can use, run `ng g c --help`. 
+I> **Pro-tip:** There are additional options and aliases available to the `nx g component` command. To see a list of options run `nx g component --help`. Also check out `nx g lib --help` and `nx g app --help`!
 
 Next, let's go over the implementation of each of the components and what their purposes are.
 
@@ -207,7 +241,7 @@ This component injects a global stylesheet into our application when used.
 
 This component is useful for overriding global style rules such as `body { margin: 0 }`.
 
-**libs/ui/src/lib/global-styles.tsx**
+**libs/ui/src/lib/global-styles/global-styles.tsx**
 
 ```typescript
 import React from 'react';
@@ -232,7 +266,7 @@ export default GlobalStyles;
 
 This component is pretty self-explanatory. It renders a styled button and passes through other props to the actual `<button>`.
 
-**libs/ui/src/lib/button.tsx**
+**libs/ui/src/lib/button/button.tsx**
 
 ```typescript
 import React, { ButtonHTMLAttributes } from 'react';
@@ -265,7 +299,7 @@ export default Button;
 
 These two components are used for layout. The header component forms the top header bar, while the main component takes up the rest of the page.
 
-**libs/ui/src/lib/header.tsx**
+**libs/ui/src/lib/header/header.tsx**
 
 ```typescript
 import React, { HTMLAttributes } from 'react';
@@ -301,7 +335,7 @@ export const Header = (props: HTMLAttributes<HTMLElement>) => (
 export default Header;
 ```
 
-**libs/ui/src/lib/main.tsx**
+**libs/ui/src/lib/main/main.tsx**
 
 ```typescript
 import React, { HTMLAttributes } from 'react';
@@ -324,7 +358,7 @@ export default Main;
 
 And finally, the `NavigationList` and `NavigationItem` components will render the navigation bar inside our top `Header` component.
 
-**libs/ui/src/lib/navigation-list.tsx**
+**libs/ui/src/lib/navigation-list/navigation-list.tsx**
 
 ```typescript
 import React, { HTMLAttributes } from 'react';
@@ -350,7 +384,7 @@ export const NavigationList = (props: HTMLAttributes<HTMLElement>) => {
 export default NavigationList;
 ```
 
-**libs/ui/src/lib/navigation-item.tsx**
+**libs/ui/src/lib/navigation-item/navigation-item.tsx**
 
 ```typescript
 import React, { LiHTMLAttributes } from 'react';
@@ -503,8 +537,8 @@ The next step is to use the `getBooks` function within our `books` feature. We c
 ```typescript
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getBooks } from '@myorg/bookss/data-access';
-import { Books, Book } from '@myorg/bookss/ui';
+import { getBooks } from '@myorg/books/data-access';
+import { Books, Book } from '@myorg/books/ui';
 
 export const BooksFeature = () => {
   const [books, setBooks] = useState([]);
@@ -532,14 +566,14 @@ You'll notice that we're using two new components: `Books` and `Book`. They can 
 ```bash
 nx g lib ui --directory books
 nx g component Books --project books-ui --export
-nx g component Book --project books-ui
+nx g component Book --project books-ui --export
 ```
 
 We generally want to put *presentational* components into their own UI library. This will prevent effects from bleeding into them, thus making them easier to understand and test.
 
 Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
  
-**libs/books/ui/src/lib/books.tsx**
+**libs/books/ui/src/lib/books/books.tsx**
 
 ```typescript
 import React from 'react';
@@ -568,7 +602,7 @@ export const Books = ({ books }: BooksProps) => {
 export default Books;
 ```
 
-**libs/books/ui/src/lib/book.tsx**
+**libs/books/ui/src/lib/book/book.tsx**
 
 ```typescript
 import React from 'react';

@@ -19,11 +19,13 @@ Now, let's create our workspace.
 
 ## Creating an Nx workspace
 
-You can create the workspace using `yarn` as follows:
+You can create the workspace as follows:
 
 ```bash
-yarn create nx-workspace
+npx create-nx-workspace
 ```
+
+I> Note: The `npx` binary comes bundled with NodeJS. It allows you to conveniently install then run a Node binary.
 
 Nx will ask you for a **workspace name**. Let's use `myorg` as it is the name of our imaginary organization. The workspace name is used by Nx to scope our libraries, just like [npm scoped packages](https://docs.npmjs.com/misc/scope).
 
@@ -83,10 +85,10 @@ The `workspace.json` file configures our projects (applications and libraries) w
 To serve the application, use this command:
 
 ```bash
-yarn nx serve bookstore
+nx serve bookstore
 ```
 
-This command will build the `bookstore` application, then start a development server at port 4200.
+The above command will build the `bookstore` application, then start a development server at port 4200.
  
 When we navigate to <http://localhost:4200> we are presented with a friendly welcome page.
 
@@ -94,29 +96,26 @@ When we navigate to <http://localhost:4200> we are presented with a friendly wel
 
 ## Nx commands
 
-Nx comes with a set of targets that can be executed on our projects. You run a target by running commands in the form: `yarn nx [target] [project]`.
+Nx comes with a set of targets that can be executed on our projects. You run a target by running commands in the form: `nx [target] [project]`.
 
 For example, for our `bookstore` app we can run the following targets.
 
 ```bash
 # Run a linter for the application
-yarn nx lint bookstore
+npx nx lint bookstore
 
 # Run unit tests for the application
-yarn nx test bookstore
+npx nx test bookstore
 
 # Run e2e tests  for the application
-yarn nx e2e bookstore-e2e
+npx nx e2e bookstore-e2e
 ```
 
 Give these commands a try!
 
-![`yarn nx e2e bookstore-e2e`](images/1-cypress.png)
+![`nx e2e bookstore-e2e`](images/1-cypress.png)
 
-I> Note: We are using `yarn nx` to run the `nx` binary that is local to our workspace.
-I> You can also install it globally if you prefer: `yarn global add @nrwl/cli`.
-
-Lastly, Nx allows us to examine the dependency graph of our workspace with the `yarn nx dep-graph`
+Lastly, Nx allows us to examine the dependency graph of our workspace with the `nx dep-graph`
 command.
 
 ![Dependency graph of the workspace](images/1-dep-graph.png)
@@ -128,7 +127,7 @@ There isn't much in the workspace to make this graph useful just yet, but we wil
 It's easier to work with Nx when we have it installed globally. You can do this by running:
 
 ```bash
-yarn global add @nrwl/cli
+npm install -g @nrwl/cli
 ```
 
 Check that the install has worked by issuing the command `nx --version`.
@@ -207,30 +206,6 @@ Make sure the tests still pass:
 
 - `nx test bookstore`
 - `nx e2e bookstore-e2e`
-
-Now, lets configure the workspace to use `styled-components`, so when we generate new components and libraries it will be the default.
-
-Open up the **workspace.json** file, and update `schematics['@nrwl/react']` to the following:
-
-```json
-{
-  "schematics": {
-    "@nrwl/react": {
-      "application": {
-        "linter": "eslint",
-        "style": "styled-components"
-      },
-      "library": {
-        "linter": "eslint",
-        "style": "styled-components"
-      },
-      "component": {
-        "style": "styled-components"
-      }
-    }
-  }
-}
-```
 
 It's a good idea to commit our code before making any more changes.
 

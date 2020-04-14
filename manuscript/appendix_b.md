@@ -8,7 +8,7 @@ There are four places where you will need to run different commands.
 1. `yarn create ...` becomes `npm init ...`.
 2. `yarn add ...` becomes `npm install --save ...`.
 3. `yarn global add ...` becomes `npm install -g ...`.
-4. `yarn nx ... becomes `npm run nx ...`.
+4. `nx ... becomes `npm run nx ...`.
 
 In [Chapter 1](#chapter-1) when you create the workspace, you should run `npm init nx-workspace`.
 

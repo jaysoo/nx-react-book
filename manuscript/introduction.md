@@ -82,6 +82,4 @@ In **chapter 3** we examine how Nx deals with code changes in the monorepo by ar
 
 In **chapter 4** we wrap up our application by implementing the `shopping-cart` feature, where users can add books to their cart for checkout.
 
-In **chapter 5** we will look at how we can create production bundles and deployment strategies.
-
-And finally, this book assumes that you are using `yarn` as your package manager. If you are using `npm` then [Appendix B](#appendix-b) shows you how to run the same commands using `npm`.
+Finally, this book assumes that you are using `yarn` as your package manager. If you are using `npm` then [Appendix B](#appendix-b) shows you how to run the same commands using `npm`.

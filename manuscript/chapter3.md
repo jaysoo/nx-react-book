@@ -23,7 +23,7 @@ Let's say we want to add a **checkout** button to each of the books in the list.
 
 We can update our `Book`, `Books`, and `BooksFeature` components to pass along a new `onAdd` callback prop.
 
-**libs/books/ui/src/lib/book.tsx**
+**libs/books/ui/src/lib/book/book.tsx**
 
 ```
 import React from 'react';
@@ -77,7 +77,7 @@ export const Book = ({ book, onAdd }: BookProps) => {
 export default Book;
 ```
 
-**libs/books/ui/src/lib/books.tsx**
+**libs/books/ui/src/lib/books/books.tsx**
 
 ```typescript
 import React from 'react';
@@ -99,7 +99,7 @@ export const Books = ({ books, onAdd }: BooksProps) => {
   return (
     <StyledBooks>
       {books.map(book => (
-        {/* Pass down new callback prop */}
+        // Pass down new callback prop
         <Book key={book.id} book={book} onAdd={onAdd} />
       ))}
     </StyledBooks>
@@ -114,8 +114,8 @@ export default Books;
 ```typescript
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getBooks } from '@myorg/bookss/data-access';
-import { Books, Book } from '@myorg/bookss/ui';
+import { getBooks } from '@myorg/books/data-access';
+import { Books, Book } from '@myorg/books/ui';
 
 export const BooksFeature = () => {
   const [books, setBooks] = useState([]);
@@ -148,7 +148,7 @@ nx affected:dep-graph
 
 ![Affected dependencies](images/3-affected-dep-graph.png)
 
-As we can see, Nx knows that the `books` library has changed from the `master` branch; it has indicates the dependent projects affected by this change in *red*. Furthermore, Nx also allows us to retest only the affected projects.
+As we can see, Nx knows that the `books-ui` library has changed from the `master` branch; it has indicates the dependent projects affected by this change in *red*. Furthermore, Nx also allows us to retest only the affected projects.
 
 We can **lint** the projects affected by the changeset. 
 
@@ -345,19 +345,20 @@ And now we can update the following five files to use the new model:
 **apps/api/src/main.ts**
 
 ```typescript
+import { IBook } from '@myorg/shared-models';
 // ...
 
 app.get('/api/books', (req, res) => {
-  const products: IBook[] = [
+  const books: IBook[] = [
     // ...
   ];
-  res.send(products);
+  res.send(books);
 });
 
 // ...
 ```
 
-**libs/products/data-access/src/lib/products-data-access.ts**
+**libs/books/data-access/src/lib/books-data-access.ts**
 
 ```typescript
 import { IBook } from '@myorg/shared-models';
@@ -393,7 +394,7 @@ export const BooksFeature = () => {
 export default BooksFeature;
 ```
 
-**libs/products/ui/src/lib/books.tsx**
+**libs/books/ui/src/lib/books/books.tsx**
 
 ```typescript
 // ...
@@ -410,7 +411,7 @@ export interface BooksProps {
 export default Books;
 ```
 
-**libs/products/ui/src/lib/book.tsx**
+**libs/books/ui/src/lib/book/book.tsx**
 
 ```typescript
 // ...
@@ -432,13 +433,6 @@ export default Book;
 By using Nx, we have created a shared model library and refactored both frontend and backend code in about a minute.
 
 Another major benefit of working within a monorepo is that we can check in these changes as a *single commit*. This means that the corresponding pull-request contains the full story, rather than being fragmented amongst multiple pull-requests and repositories. 
-
-
-## Enforcing hard boundaries
-
-So far we've created soft boundaries around our libraries by labeling them as *feature*, *UI*, *data-access*, or *util*.
-
-(TODO: Complete this section)
 
 ## Automatic code formatting
 
@@ -470,8 +464,6 @@ T>
 T> Nx can retest and rebuild only the affected projects within our workspace.
 T>
 T> By using a monorepo, related changes in different projects can be in the same changeset (i.e. pull-request), which gives us the full picture of the changes.
-T>
-T> Nx allows us to strictly enforce library project boundaries. 
 T>
 T> Nx automatically formats our code for us in an opinionated way using Prettier.
 
