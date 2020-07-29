@@ -26,9 +26,9 @@ We can update our `Book`, `Books`, and `BooksFeature` components to pass along a
 **libs/books/ui/src/lib/book/book.tsx**
 
 ```
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
-import { Button } from '@myorg/ui';
+import { Button } from '@acme/ui';
 
 export interface BookProps {
   book: any;
@@ -59,6 +59,7 @@ const StyledBook = styled.div`
 `;
 
 export const Book = ({ book, onAdd }: BookProps) => {
+  const handleAdd = useCallback(() => onAdd(book), [book]);
   return (
     <StyledBook>
       <span className="title">
@@ -68,7 +69,7 @@ export const Book = ({ book, onAdd }: BookProps) => {
       <span className="price">${book.price}</span>
       {/* Add button to UI */}
       <span>
-        <Button onClick={() => onAdd(book)}>Add to Cart</Button>
+        <Button onClick={handleAdd}>Add to Cart</Button>
       </span>
     </StyledBook>
   );
@@ -114,8 +115,8 @@ export default Books;
 ```typescript
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getBooks } from '@myorg/books/data-access';
-import { Books, Book } from '@myorg/books/ui';
+import { getBooks } from '@acme/books/data-access';
+import { Books, Book } from '@acme/books/ui';
 
 export const BooksFeature = () => {
   const [books, setBooks] = useState([]);
@@ -148,7 +149,7 @@ nx affected:dep-graph
 
 ![Affected dependencies](images/3-affected-dep-graph.png)
 
-As we can see, Nx knows that the `books-ui` library has changed from the `master` branch; it has indicates the dependent projects affected by this change in *red*. Furthermore, Nx also allows us to retest only the affected projects.
+As we can see, Nx knows that the `books-ui` library has changed from the main branch; it indicates the dependent projects affected by this change in *red*. Furthermore, Nx also allows us to re-test only the affected projects.
 
 We can **lint** the projects affected by the changeset. 
 
@@ -168,9 +169,9 @@ Or even run **e2e tests** for the affected projects.
 nx affected:e2e
 ```
 
-Nx topologically sorts the projects so they are run from bottom to top. That is, projects at the bottom of the dependency chain are run first. We're also using the `--parallel` option to enable Nx to run our projects in parallel.
+Nx topologically sorts the projects such that they are run from bottom to top. That is, projects at the bottom of the dependency chain run first. We're also using the `--parallel` option to enable Nx to run our projects in parallel.
 
-And just as with the `affected:dep-graph` command, the default base is the `master` branch. This default branch should be correct most of the time, but can be changed with the `--base=[branch]` option. For example, if your team uses git-flow then you may want to use `--base=develop` when doing work on the development branch.
+All of the `affected:*` commands use `master` as the default base branch. This default branch can be changed by updating the `defaultBase` in the `nx.json` file. You can also pass the `--base` option to override it for a single run.
 
 A> Note that in these projects, Nx is using [Jest](https://jestjs.io) and [Cypress](https://www.cypress.io/) to run unit and e2e tests respectively. They make writing and running tests are fast and simple as possible. If you're not familiar with them, please read their documentation to learn more.
 A>
@@ -194,7 +195,7 @@ The listing of affected applications and libraries can be useful in CI to trigge
 
 ## Adding the API application
 
-By the way, now is a good time to commit your changes if you haven't done so already.
+By the way, now is a good time to commit your changes if you haven't done so already: `git add . ; git commit -m 'added checkout button'`.
 
 So far our `bookstore` application does not communicate with a real backend service. Let's create one using the [Express](https://expressjs.com) framework.
 
@@ -204,7 +205,7 @@ We'll need to install the `@nrwl/express` collection first.
 yarn add --dev @nrwl/express
 ```
 
-Then we can do a dry run of the generate command.
+Then we can do a dry run of the express app schematic.
 
 ```bash
 nx g @nrwl/express:app api \
@@ -223,15 +224,15 @@ nx g @nrwl/express:app api \
 --frontend-project=bookstore
 ```
 
-The `--frontend-project` option will add proxy configuration to the `bookstore` application such that requests going to `/api/*` will be forwarded to the API
+The `--frontend-project` option will add a proxy configuration to the `bookstore` application such that requests going to `/api/*` will be forwarded to the API
 
-And just like our frontend application, we can use Nx to serve the API.
+Just like our frontend application, we can use Nx to serve the API.
 
 ```bash
 nx serve api
 ```
 
-When we open up `http://localhost:3333/api` we'll be greeted by a nice message.
+When we open up `http://localhost:3333/api` we'll be greeted by a friendly message.
 
 ```json
 
@@ -299,7 +300,7 @@ const server = app.listen(port, () => {
 server.on('error', console.error);
 ```
 
-Finally, let's update our data-access library to call the proxied endpoint.
+Finally, let's update our data-access library to call the proxy endpoint.
 
 **libs/books/data-access/src/lib/books-data-access.ts**
 
@@ -317,6 +318,8 @@ export async function getBooks() {
 If we restart both applications (`nx serve api` and `nx serve bookstore`) we'll see that our [bookstore](http://localhost:4200) is still working in the browser. Moreover, we can verify that our `/api/books` endpoint is indeed being called.
 
 ![](images/3-api-verify.png)
+
+Let's commit our changes: `git add . ; git commit -am 'added api app'`.
 
 ### Sharing models between frontend and backend
 
@@ -345,7 +348,7 @@ And now we can update the following five files to use the new model:
 **apps/api/src/main.ts**
 
 ```typescript
-import { IBook } from '@myorg/shared-models';
+import { IBook } from '@acme/shared-models';
 // ...
 
 app.get('/api/books', (req, res) => {
@@ -361,7 +364,7 @@ app.get('/api/books', (req, res) => {
 **libs/books/data-access/src/lib/books-data-access.ts**
 
 ```typescript
-import { IBook } from '@myorg/shared-models';
+import { IBook } from '@acme/shared-models';
 
 // Add correct type for the return value
 export async function getBooks(): Promise<IBook[]> {
@@ -375,11 +378,11 @@ export async function getBooks(): Promise<IBook[]> {
 
 ```typescript
 ...
-import { IBook } from '@myorg/shared-models';
+import { IBook } from '@acme/shared-models';
 
 export const BooksFeature = () => {
-  // Replace any with IBook
-  const [books, setBooks] = useState([] as IBook[]);
+  // Properly type the array
+  const [books, setBooks] = useState<IBook[]>([]);
 
   // ...
 
@@ -398,7 +401,7 @@ export default BooksFeature;
 
 ```typescript
 // ...
-import { IBook } from '@myorg/shared-models';
+import { IBook } from '@acme/shared-models';
 
 // Replace any with IBook
 export interface BooksProps {
@@ -415,7 +418,7 @@ export default Books;
 
 ```typescript
 // ...
-import { IBook } from '@myorg/shared-models';
+import { IBook } from '@acme/shared-models';
 
 // Replace any with IBook
 export interface BookProps {
@@ -432,15 +435,15 @@ export default Book;
 
 By using Nx, we have created a shared model library and refactored both frontend and backend code in about a minute.
 
-Another major benefit of working within a monorepo is that we can check in these changes as a *single commit*. This means that the corresponding pull-request contains the full story, rather than being fragmented amongst multiple pull-requests and repositories. 
+Another major benefit of working within a monorepo is that we can check in these changes as a *single commit*: `git add . ; git commit -m 'add shared models'`. The corresponding pull-request with the commit will have the full story, rather than being fragmented amongst multiple pull-requests and repositories.
 
 ## Automatic code formatting
 
 One of the easiest ways to waste time as a developer is on code style. We can spend time *hours* debating with one another on whether we should use semicolons or not--you should; or whether we should use a comma-first style or not--you shouldn't.
 
-[Prettier](https://prettier.io) was created to stop these endless debates over code style. It is highly opinionated and provides minimal configuration options. And best of all, it can format our code *automatically*! This means that we no longer need to manually fix code to conform to the code style.
+[Prettier](https://prettier.io) was created to stop these endless debates over code style. It is highly opinionated and provides minimal configuration options. Best of all, it can format our code *automatically*. This means that we no longer need to manually fix code to conform to the code style.
 
-Nx comes prepackaged with Prettier. With it, we can check the formatting of the workspace, and format workspace code automatically.
+Nx workspaces come with Prettier installed from the get-go. With it, we can check the formatting of the workspace, and format workspace code automatically.
 
 ```bash
 # Checks for format conformance with Prettier.

@@ -13,11 +13,11 @@ Let's start by going through the terminology that Nx uses.
 : A package that uses multiple libraries to form a runnable program. An application is usually either run in the browser or by Node.
 
 **Library**
-: A set of files that deal with related concerns. For example, a shared component UI library.
+: A set of files that deal with related concerns. For example, a shared component library.
 
 Now, let's create our workspace.
 
-## Creating an Nx workspace
+## Creating a Nx workspace
 
 You can create the workspace as follows:
 
@@ -27,45 +27,48 @@ npx create-nx-workspace
 
 I> Note: The `npx` binary comes bundled with NodeJS. It allows you to conveniently install then run a Node binary.
 
-Nx will ask you for a **workspace name**. Let's use `myorg` as it is the name of our imaginary organization. The workspace name is used by Nx to scope our libraries, just like [npm scoped packages](https://docs.npmjs.com/misc/scope).
+Nx will ask you for a **workspace name**. Let's use `acme` as it is the name of our imaginary organization. The workspace name is used by Nx to scope our libraries, just like [npm scoped packages](https://docs.npmjs.com/misc/scope).
 
 Next, you'll be prompted to select a **preset**--choose the `react` option.
 
 ![Creating a workspace](images/1-create-workspace.png)
 
-Lastly, you'll be prompted for the application name and the styling format you want to use. Let's use `bookstore` as our application name and `styled-components` for styling.
+Lastly, you'll be prompted for the application name, and the styling format you want to use. Let's use `bookstore` as our application name and `styled-components` for styling.
 
 ![Choosing  a style option](images/1-choose-style.png)
 
 Once Nx finishes creating the workspace, we will end up with something like this:
 
 ```
-myorg
-├── apps
-│   ├── bookstore
-│   │   ├── src
-│   │   │   ├── app
-│   │   │   ├── assets
-│   │   │   ├── environments
+acme/
+├── apps/
+│   ├── bookstore/
+│   │   ├── src/
+│   │   │   ├── app/
+│   │   │   ├── assets/
+│   │   │   ├── environments/
 │   │   │   ├── favicon.ico
 │   │   │   ├── index.html
 │   │   │   ├── main.tsx
 │   │   │   └── polyfills.ts
-│   │   ├── browserslist
+│   │   ├── .babelrc
+│   │   ├── .browserslistrc
+│   │   ├── .eslintrc
+│   │   ├── babel-jest.config.json
 │   │   ├── jest.config.js
-│   │   ├── tsconfig.app.json
 │   │   ├── tsconfig.json
+│   │   ├── tsconfig.app.json
 │   │   └── tsconfig.spec.json
 │   └── bookstore-e2e
-├── libs
-├── tools
-│   ├── schematics
-│   └── tsconfig.tools.json
+├── libs/
+├── tools/
 ├── README.md
+├── babel.config.json
+├── jest.config.js
 ├── nx.json
 ├── package.json
 ├── tools
-├── tsconfig.json
+├── tsconfig.base.json
 └── workspace.json
 ```
 
@@ -113,9 +116,9 @@ npx nx e2e bookstore-e2e
 
 Give these commands a try!
 
-![`nx e2e bookstore-e2e`](images/1-cypress.png)
+![`npx nx e2e bookstore-e2e`](images/1-cypress.png)
 
-Lastly, Nx allows us to examine the dependency graph of our workspace with the `nx dep-graph`
+Lastly, Nx allows us to examine the dependency graph of our workspace with the `npx nx dep-graph`
 command.
 
 ![Dependency graph of the workspace](images/1-dep-graph.png)
@@ -132,9 +135,9 @@ npm install -g @nrwl/cli
 
 Check that the install has worked by issuing the command `nx --version`.
 
-Now you will be able to run Nx commands without going through `yarn` (e.g. `nx serve bookstore`).
+Now you will be able to run Nx commands without going through `npx` (e.g. `nx serve bookstore`).
 
-For the rest of this book, I will assume that you have Nx installed globally. If you haven't, simply run all issued commands through `yarn`.
+For the rest of this book, I will assume that you have Nx installed globally. If you haven't, simply run all issued commands through `npx`.
 
 ## Preparing for development
 
@@ -218,7 +221,7 @@ git commit -m 'end of chapter one'
 
 T> **Key points**
 T>
-T> An Nx workspace consists of two types of projects: *applications* and *libraries*.
+T> A typical Nx workspace consists of two types of projects: *applications* and *libraries*.
 T>
 T> A newly created workspace comes with a set of targets we can run on the generated application: `lint`, `test`, and `e2e`.
 T> 

@@ -7,7 +7,7 @@ So now we can start adding to our application by creating and using libraries.
 
 ## Types of libraries
 
-In a workspace, libraries are generally divided into four different types:
+In a workspace, libraries are typically divided into four different types:
 
 **Feature**
 : Libraries that implement "smart" UI (e.g. is effectful, is connected to data sources, handles routing, etc.) for specific **business use cases**.
@@ -43,7 +43,7 @@ nx g lib feature \
 
 The `--directory` option allows us to group our libraries by nesting them under their parent directory. In this case the library is created in the `libs/books/feature` folder. It is aliased to `-d`.
 
-The `--appProject` option lets Nx know that we want to make our feature library to be routable inside the specified application. This option is not needed, but it is useful because Nx will do three things for us. It is aliased to `-a`.
+The `--appProject` option lets Nx know that we want to make our feature library to be routable inside the specified application. This option is useful because Nx will do three things for us.
 
 1. Update `apps/bookstore/src/app/app.tsx` with the new route.
 2. Update `apps/bookstore/src/main.tsx` to add `BrowserRouter` if it does not exist yet.
@@ -54,20 +54,22 @@ I> **Pro-tip:** You can pass the `--dryRun` option to `generate` to see the effe
 Once the command completes, you should see the new directory.
 
 ```
-myorg
+acme/
 ├── (...)
-├── libs
+├── libs/
 │   ├── (...)
-│   └──books
-│       └── feature
-│           ├── src
-│           │   ├── lib
+│   └──books/
+│       └── feature/
+│           ├── src/
+│           │   ├── lib/
 │           │   └── index.ts
+│           ├── .babelrc
 │           ├── .eslintrc
+│           ├── babel-jest.config.js
 │           ├── jest.config.js
 │           ├── README.md
-│           ├── tsconfig.app.json
 │           ├── tsconfig.json
+│           ├── tsconfig.lib.json
 │           └── tsconfig.spec.json
 └── (...)
 ```
@@ -86,7 +88,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Route, Link } from 'react-router-dom';
 
-import { BooksFeature } from '@myorg/books/feature';
+import { BooksFeature } from '@acme/books/feature';
 
 const StyledApp = styled.div``;
 
@@ -154,16 +156,18 @@ import App from './app/app';
 import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>,
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>,
   document.getElementById('root')
 );
 ```
 
-Restart the development server again (`nx serve bookstore`) and you should see the updated application.
+Restart the development server again (`nx serve bookstore`), and you should see the updated application.
 
-I> Be aware that when you add a new project to the workspace, you must restart your development server. This restart is necessary in order for the TypeScript compiler to pick up new library paths, such as `@myorg/books/feature`.
+I> Be aware when you add a new project to the workspace, you must restart your development server. This restart is necessary in order for the TypeScript compiler to pick up new library paths, such as `@acme/books/feature`.
 
 By using a monorepo, we've *skipped* a few steps that are usually required when creating a new library.
 
@@ -197,7 +201,7 @@ Please note that we will make heavy use of [`styled-components`](https://www.sty
 Back to the example. You should have a new folder: `libs/ui`.
 
 ```
-myorg
+acme
 ├── (...)
 ├── libs
 │   ├── (...)
@@ -229,9 +233,9 @@ The `--project` option specifies which project (as found in the `projects` secti
 
 The `--export` option tells Nx to export the new component in the `index.ts` file of the project so that it can be imported elsewhere in the workspace. You may leave this option off if you are generating private/internal components. It is aliased to `-e`.
 
-If you do forget the `--export` option you can always manually add the export to `index.ts`.
+If you do forget the `--export` option you can always manually add the export barrel to `index.ts`.
 
-I> **Pro-tip:** There are additional options and aliases available to the `nx g component` command. To see a list of options run `nx g component --help`. Also check out `nx g lib --help` and `nx g app --help`!
+I> **Pro-tip:** There are additional options and aliases available to the `nx g component` command. To see a list of options run `nx g component --help`. Also, check out `nx g lib --help` and `nx g app --help`!
 
 Next, let's go over the implementation of each of the components and what their purposes are.
 
@@ -411,14 +415,14 @@ Now we can use the new library in our `bookstore`'s app component.
 import React from 'react';
 import { Link, Redirect, Route } from 'react-router-dom';
 
-import { BooksFeature } from '@myorg/books/feature';
+import { BooksFeature } from '@acme/books/feature';
 import {
   GlobalStyles,
   Header,
   Main,
   NavigationItem,
   NavigationList
-} from '@myorg/ui';
+} from '@acme/ui';
 
 export const App = () => {
   return (
@@ -451,7 +455,7 @@ We'll save our progress with a new commit.
 
 ```bash
 git add .
-git commit -m 'Add books feature and ui libraries'
+git commit -m 'add books feature and ui components'
 ```
 
 That's great, but we are still not seeing any books, so let's do something about this.
@@ -479,6 +483,8 @@ We were able to go without this prefix previously because the `workspace.json` c
 ```
 
 In this case, the `@nrwl/web:lib` schematic will create a library to be used in a web (i.e. browser) context without assuming the framework used. In contrast, when using `@nrwl/react:lib`, it assumes that you want to generate a default component as well as potentially setting up routes.
+
+I> **Pro-tip:** A collection in Nx contains a set of *schematics* and *builders*. Schematics can be invoked using the `generate` command. Builders perform actions on your code, including build, lint, and test and are invoked by issuing commands to Nx--such as `nx lint` and `nx test`. Use `nx list [collection]` to list everything provided by the collection--e.g. `nx list @nrwl/react`.
 
 Back to the example. Let's modify the library to export a `getBooks` function to load our list of books.
 
@@ -537,8 +543,8 @@ The next step is to use the `getBooks` function within our `books` feature. We c
 ```typescript
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { getBooks } from '@myorg/books/data-access';
-import { Books, Book } from '@myorg/books/ui';
+import { getBooks } from '@acme/books/data-access';
+import { Books, Book } from '@acme/books/ui';
 
 export const BooksFeature = () => {
   const [books, setBooks] = useState([]);
@@ -569,7 +575,7 @@ nx g component Books --project books-ui --export
 nx g component Book --project books-ui --export
 ```
 
-We generally want to put *presentational* components into their own UI library. This will prevent effects from bleeding into them, thus making them easier to understand and test.
+We generally want to put *presentational* components into their own UI library. This will prevent side-effects from bleeding into them, thus making them easier to understand and test.
 
 Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
  
@@ -607,7 +613,7 @@ export default Books;
 ```typescript
 import React from 'react';
 import styled from 'styled-components';
-import { Button } from '@myorg/ui';
+import { Button } from '@acme/ui';
 
 export interface BookProps {
   book: any;
@@ -662,8 +668,8 @@ We'll address both problems in the [next chapter](#chapter-3).
 
 T> **Key points**
 T>
-T> Libraries are separated into four types: *feature*, *UI*, *data-access*, and *util*.
+T> There are four type of libraries: *feature*, *UI*, *data-access*, and *util*.
 T> 
 T> Nx provides us with the `nx generate` or `nx g` command to *quickly* create new libraries from scratch.
 T>
-T> When running `nx g` we can optionally provide a collection such as `@nrwl/web:lib` as opposed to `lib`. This will tell Nx to use the schematic from that specific collection rather than taking the workspace's `defaultCollection`. 
+T> When running `nx g` we can optionally provide a collection such as `@nrwl/web:lib` as opposed to `lib`. This will tell Nx to use the schematic from that specific collection rather than the default as set in `nx.json`. 
