@@ -80,6 +80,8 @@ In **chapter 2** we build new libraries to support a book listing feature.
 
 In **chapter 3** we examine how Nx deals with code changes in the monorepo by arming us with intelligent tools to help us understand and verify changes. We will demonstrate these Nx tools by creating an `api` backend application.
 
-In **chapter 4** we wrap up our application by implementing the `shopping-cart` feature, where users can add books to their cart for checkout.
+In **chapter 4** we wrap up our application by implementing the `cart` feature, where users can add books to their cart for check out.
 
-Finally, this book assumes that you are using `yarn` as your package manager. If you are using `npm` then [Appendix B](#appendix-b) shows you how to run the same commands using `npm`.
+In **chapter 5** we discuss how Nx help with Continuous Integration and Deployment.
+
+Finally, this book assumes that you are using `yarn` as your package manager. If you are using `npm` then simply replace `yarn add` with `npm install`.

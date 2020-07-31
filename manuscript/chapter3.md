@@ -183,7 +183,11 @@ So far we haven't been diligent about verifying that our changes are okay, so un
 
 ![`nx affected:e2e` failed](images/3-failed-e2e.png)
 
-I'll leave it to you as an exercise to fix the broken unit and e2e tests. **Tip:** Run the tests in watch mode by passing the `--watch` option so that tests are rerun whenever the source or test code change.
+I'll leave it to you as an exercise to fix the broken unit and e2e tests. A hint for the `App` component test, you should look into the `MemoryRouter` from React Router.
+
+I> **Pro-Tip:** You can run a target for an individual project by issuing `nx [target] [project]` such as `nx test books-ui`, `nx test bookstore`, or `nx e2e bookstore-e2e`. You may also pass the `--watch` flag to re-run tests as soon there is a code change.
+
+For the full solution please see the bookstore example repository: https://github.com/jaysoo/nx-react-book-example.
 
 There are three additional affected commands in Nx.
 
@@ -454,7 +458,7 @@ nx format:check
 nx format:write
 ```
 
-Lastly, you may want to set up a pre-commit git hook to run `nx format:write` so we can ensure 100% conformance whenever code is checked in. For more details please refer to [Appendix C](#appendix-c). 
+Lastly, you may want to set up a pre-commit git hook to run `nx format:write` so we can ensure 100% conformance whenever code is checked in. For more details please refer to [Appendix B](#appendix-b). 
 
 ***
 
