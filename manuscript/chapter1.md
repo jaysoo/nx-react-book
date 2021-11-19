@@ -39,35 +39,31 @@ Lastly, you'll be prompted for the application name, and the styling format you 
 
 Once Nx finishes creating the workspace, we will end up with something like this:
 
-```
-acme/
-├── apps/
-│   ├── bookstore/
-│   │   ├── src/
-│   │   │   ├── app/
-│   │   │   ├── assets/
-│   │   │   ├── environments/
-│   │   │   ├── favicon.ico
-│   │   │   ├── index.html
-│   │   │   ├── main.tsx
-│   │   │   └── polyfills.ts
-│   │   ├── .babelrc
-│   │   ├── .browserslistrc
-│   │   ├── .eslintrc
-│   │   ├── babel-jest.config.json
+```text
+.
+├── apps
+│   ├── bookstore
 │   │   ├── jest.config.js
-│   │   ├── tsconfig.json
+│   │   ├── src
 │   │   ├── tsconfig.app.json
+│   │   ├── tsconfig.json
 │   │   └── tsconfig.spec.json
 │   └── bookstore-e2e
-├── libs/
-├── tools/
-├── README.md
+│       ├── cypress.json
+│       ├── src
+│       ├── tsconfig.e2e.json
+│       └── tsconfig.json
+├── libs
 ├── babel.config.json
 ├── jest.config.js
+├── jest.preset.js
+├── README.md
 ├── nx.json
+├── package-lock.json
 ├── package.json
 ├── tools
+│   ├── generators
+│   └── tsconfig.tools.json
 ├── tsconfig.base.json
 └── workspace.json
 ```
@@ -75,15 +71,15 @@ acme/
 The `apps` folder contain the code of all applications in our workspace. Nx has created two applications by default:
 
 - The `bookstore` application itself; and 
-- A set of end-to-end (e2e) tests written to test `bookstore` application.
+- A set of end-to-end (E2E) tests written to test `bookstore` application using Cypress.
 
 The `libs` folder will eventually contain our libraries (more on that in [Chapter 2](#chapter-2)). It is empty for now.
 
-The `tools` folder can be used for scripts that are specific to the workspace. The generated `tools/schematics` folder is for Nx's workspace schematics feature which we cover in [Appendix A](#appendix-a).
+The `tools` folder can be used for scripts that are specific to the workspace. The generated `tools/generators` folder 
+is for Nx's [workspace generators](https://nx.dev/generators/workspace-generators) feature which you can learn more about
+by reading the documentation (https://nx.dev/generators/workspace-generators).
 
 The `nx.json` file configures Nx (as we'll see in [Chapter 4](#chapter-4)).
-
-The `workspace.json` file configures our projects (applications and libraries) within the workspace. Here, you can specify what and how commands like `lint`, `test`, and `e2e` are run.
 
 To serve the application, use this command:
 
@@ -133,7 +129,7 @@ It's easier to work with Nx when we have it installed globally. You can do this 
 npm install -g @nrwl/cli
 ```
 
-Check that the install has worked by issuing the command `nx --version`.
+Check that installation has worked by issuing the command `nx --version`.
 
 Now you will be able to run Nx commands without going through `npx` (e.g. `nx serve bookstore`).
 
@@ -148,7 +144,6 @@ Open up your favorite editor and modify these three files.
 **apps/bookstore/src/app/app.tsx**
 
 ```typescript
-import React from 'react';
 import styled from 'styled-components';
 
 const StyledApp = styled.div``;
@@ -169,7 +164,6 @@ export default App;
 **apps/bookstore/src/app/app.spec.tsx**
 
 ```typescript
-import React from 'react';
 import { render, cleanup } from '@testing-library/react';
 
 import App from './app';
@@ -207,6 +201,7 @@ describe('bookstore', () => {
 
 Make sure the tests still pass:
 
+- `nx lint bookstore`
 - `nx test bookstore`
 - `nx e2e bookstore-e2e`
 

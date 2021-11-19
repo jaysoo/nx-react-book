@@ -29,7 +29,7 @@ We'll see in [the next chapter](#chapter-3) how we can use Nx to strictly enforc
 
 ## The `generate` command
 
-The `nx generate` or the `nx g` command, as it is aliased, allows us to use Nx schematics to create new applications, components, libraries, and more, to our workspace.
+The `nx generate` or the `nx g` command, as it is aliased, allows us to use Nx generator to create new applications, components, libraries, and more, to our workspace.
 
 ## Feature libraries
 
@@ -54,19 +54,16 @@ I> **Pro-tip:** You can pass the `--dryRun` option to `generate` to see the effe
 Once the command completes, you should see the new directory.
 
 ```
-acme/
+.
 ├── (...)
-├── libs/
-│   ├── (...)
-│   └──books/
-│       └── feature/
-│           ├── src/
-│           │   ├── lib/
-│           │   └── index.ts
-│           ├── .babelrc
-│           ├── .eslintrc
-│           ├── babel-jest.config.js
+├── libs
+│   └── books
+│       └── feature
+│           ├── src
+│           │   ├── index.ts
+│           │   └── lib
 │           ├── jest.config.js
+│           ├── project.json
 │           ├── README.md
 │           ├── tsconfig.json
 │           ├── tsconfig.lib.json
@@ -84,14 +81,12 @@ nx test books-feature
 You'll also see that the `App` component for `bookstore` has been updated to include the new route.
 
 ```typescript
-import React from 'react';
 import styled from 'styled-components';
+
 import { Route, Link } from 'react-router-dom';
 
 import { BooksFeature } from '@acme/books/feature';
-
 const StyledApp = styled.div``;
-
 export const App = () => {
   return (
     <StyledApp>
@@ -142,26 +137,26 @@ export const App = () => {
     </StyledApp>
   );
 };
-
 export default App;
 ```
 
 Additionally, the `main.tsx` file for `bookstore` has also been updated to render `<BrowserRouter />`. This render is needed in order for `<Route />` components to work, and Nx will handle the file update for us if necessary.
 
 ```typescript
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { StrictMode } from 'react';
+import * as ReactDOM from 'react-dom';
+
 import App from './app/app';
 
 import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
+    <StrictMode>
+        <BrowserRouter>
+            <App />
     </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById('root')
+    </StrictMode>,
+document.getElementById('root')
 );
 ```
 
@@ -248,7 +243,6 @@ This component is useful for overriding global style rules such as `body { margi
 **libs/ui/src/lib/global-styles/global-styles.tsx**
 
 ```typescript
-import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyles = createGlobalStyle`
@@ -273,7 +267,7 @@ This component is pretty self-explanatory. It renders a styled button and passes
 **libs/ui/src/lib/button/button.tsx**
 
 ```typescript
-import React, { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 const StyledButton = styled.button`
@@ -306,7 +300,7 @@ These two components are used for layout. The header component forms the top hea
 **libs/ui/src/lib/header/header.tsx**
 
 ```typescript
-import React, { HTMLAttributes } from 'react';
+import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 const StyledHeader = styled.header`
@@ -342,7 +336,7 @@ export default Header;
 **libs/ui/src/lib/main/main.tsx**
 
 ```typescript
-import React, { HTMLAttributes } from 'react';
+import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 const StyledMain = styled.main`
@@ -365,7 +359,7 @@ And finally, the `NavigationList` and `NavigationItem` components will render th
 **libs/ui/src/lib/navigation-list/navigation-list.tsx**
 
 ```typescript
-import React, { HTMLAttributes } from 'react';
+import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 const StyledNavigationList = styled.div`
@@ -391,7 +385,7 @@ export default NavigationList;
 **libs/ui/src/lib/navigation-item/navigation-item.tsx**
 
 ```typescript
-import React, { LiHTMLAttributes } from 'react';
+import { LiHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 const StyledNavigationItem = styled.li`
@@ -412,7 +406,6 @@ Now we can use the new library in our `bookstore`'s app component.
 **apps/bookstore/src/app/app.tsx**
 
 ```typescript
-import React from 'react';
 import { Link, Redirect, Route } from 'react-router-dom';
 
 import { BooksFeature } from '@acme/books/feature';
@@ -468,9 +461,9 @@ What we want to do is fetch data from *somewhere* and display that in our books 
 nx g @nrwl/web:lib data-access --directory books
 ``` 
 
-You may have noticed that we are using a prefix `@nrwl/web:lib` instead of just `lib` like in our previous examples. This `@nrwl/web:lib` syntax means that we want Nx to run the `lib` (or `library`) schematic provided by the `@nrwl/web` collection.
+You may have noticed that we are using a prefix `@nrwl/web:lib` instead of just `lib` like in our previous examples. This `@nrwl/web:lib` syntax means that we want Nx to run the `lib` (or `library`) generator provided by the `@nrwl/web` collection.
 
-We were able to go without this prefix previously because the `workspace.json` configuration has set `@nrwl/react` as the default option.
+We were able to go without this prefix previously because the `nx.json` configuration has set `@nrwl/react` as the default option.
 
 ```json
 {
@@ -482,9 +475,9 @@ We were able to go without this prefix previously because the `workspace.json` c
 }
 ```
 
-In this case, the `@nrwl/web:lib` schematic will create a library to be used in a web (i.e. browser) context without assuming the framework used. In contrast, when using `@nrwl/react:lib`, it assumes that you want to generate a default component as well as potentially setting up routes.
+In this case, the `@nrwl/web:lib` generator will create a library to be used in a web (i.e. browser) context without assuming the framework used. In contrast, when using `@nrwl/react:lib`, it assumes that you want to generate a default component as well as potentially setting up routes.
 
-I> **Pro-tip:** A collection in Nx contains a set of *schematics* and *builders*. Schematics can be invoked using the `generate` command. Builders perform actions on your code, including build, lint, and test and are invoked by issuing commands to Nx--such as `nx lint` and `nx test`. Use `nx list [collection]` to list everything provided by the collection--e.g. `nx list @nrwl/react`.
+I> **Pro-tip:** A collection in Nx contains a set of *generators* and *executors*. Generators can be invoked using the `generate` command. Executors perform actions on your code, including build, lint, and test and are invoked by issuing commands to Nx--such as `nx lint` and `nx test`. Use `nx list [collection]` to list everything provided by the collection--e.g. `nx list @nrwl/react`.
 
 Back to the example. Let's modify the library to export a `getBooks` function to load our list of books.
 
@@ -541,13 +534,13 @@ The next step is to use the `getBooks` function within our `books` feature. We c
 **libs/books/feature/src/lib/books-feature.tsx**
 
 ```typescript
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@acme/books/data-access';
 import { Books, Book } from '@acme/books/ui';
 
 export const BooksFeature = () => {
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState<any[]>([]);
 
   useEffect(() => {
     getBooks().then(setBooks);
@@ -582,7 +575,6 @@ Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
 **libs/books/ui/src/lib/books/books.tsx**
 
 ```typescript
-import React from 'react';
 import styled from 'styled-components';
 import { Book } from '../book/book';
 
@@ -611,7 +603,6 @@ export default Books;
 **libs/books/ui/src/lib/book/book.tsx**
 
 ```typescript
-import React from 'react';
 import styled from 'styled-components';
 import { Button } from '@acme/ui';
 
@@ -672,4 +663,4 @@ T> There are four type of libraries: *feature*, *UI*, *data-access*, and *util*.
 T> 
 T> Nx provides us with the `nx generate` or `nx g` command to *quickly* create new libraries from scratch.
 T>
-T> When running `nx g` we can optionally provide a collection such as `@nrwl/web:lib` as opposed to `lib`. This will tell Nx to use the schematic from that specific collection rather than the default as set in `nx.json`. 
+T> When running `nx g` we can optionally provide a collection such as `@nrwl/web:lib` as opposed to `lib`. This will tell Nx to use the generator from that specific collection rather than the default as set in `nx.json`. 

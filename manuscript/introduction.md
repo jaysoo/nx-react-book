@@ -20,11 +20,12 @@ As you will see in this book, a monorepo approach when done correctly can save d
 
 ## Why Nx?
 
-Nx is a set of dev tools designed specifically to help teams work with monorepos. It provides an opinionated organizational structure, and a set of generation, linting, and testing tools.
+Nx is a smart and extensible framework that helps teams build applications at any scale. It integrates with modern frameworks
+and libraries, provides computation caching and smart rebuilds, as well as power code generators.
 
 ## Is this book for you?
 
-Because Nx creates TypeScript source code, it helps to know some of the basics such as type annotations, and interfaces.
+Because Nx creates TypeScript source code by default, it helps to know some basics such as type annotations, and interfaces.
 
 ```typescript
 // Here's a number variable
@@ -80,8 +81,5 @@ In **chapter 2** we build new libraries to support a book listing feature.
 
 In **chapter 3** we examine how Nx deals with code changes in the monorepo by arming us with intelligent tools to help us understand and verify changes. We will demonstrate these Nx tools by creating an `api` backend application.
 
-In **chapter 4** we wrap up our application by implementing the `cart` feature, where users can add books to their cart for check out.
-
-In **chapter 5** we discuss how Nx help with Continuous Integration and Deployment.
-
-Finally, this book assumes that you are using `yarn` as your package manager. If you are using `npm` then simply replace `yarn add` with `npm install`.
+In **chapter 4** we wrap up our application by implementing the `cart` feature, where users can add books to their cart for check out. We will
+also look at building and running our application in production mode.

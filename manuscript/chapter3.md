@@ -26,7 +26,6 @@ We can update our `Book`, `Books`, and `BooksFeature` components to pass along a
 **libs/books/ui/src/lib/book/book.tsx**
 
 ```
-import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { Button } from '@acme/ui';
 
@@ -59,7 +58,7 @@ const StyledBook = styled.div`
 `;
 
 export const Book = ({ book, onAdd }: BookProps) => {
-  const handleAdd = useCallback(() => onAdd(book), [book]);
+  const handleAdd = () => onAdd(book);
   return (
     <StyledBook>
       <span className="title">
@@ -81,7 +80,6 @@ export default Book;
 **libs/books/ui/src/lib/books/books.tsx**
 
 ```typescript
-import React from 'react';
 import styled from 'styled-components';
 import { Book } from '../book/book';
 
@@ -113,13 +111,13 @@ export default Books;
 **libs/books/feature/src/lib/books-feature.tsx**
 
 ```typescript
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@acme/books/data-access';
 import { Books, Book } from '@acme/books/ui';
 
 export const BooksFeature = () => {
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState<any[]>([]);
 
   useEffect(() => {
     getBooks().then(setBooks);
@@ -171,17 +169,13 @@ nx affected:e2e
 
 Nx topologically sorts the projects such that they are run from bottom to top. That is, projects at the bottom of the dependency chain run first. We're also using the `--parallel` option to enable Nx to run our projects in parallel.
 
-All of the `affected:*` commands use `master` as the default base branch. This default branch can be changed by updating the `defaultBase` in the `nx.json` file. You can also pass the `--base` option to override it for a single run.
+All of the `affected:*` commands use `main` as the default base branch. This default branch can be changed by updating the `defaultBase` in the `nx.json` file. You can also pass the `--base` option to override it for a single run.
 
 A> Note that in these projects, Nx is using [Jest](https://jestjs.io) and [Cypress](https://www.cypress.io/) to run unit and e2e tests respectively. They make writing and running tests are fast and simple as possible. If you're not familiar with them, please read their documentation to learn more.
 A>
-A> It is possible to use different runners by specifying them in `workspace.json`. See [Appendix A](#appendix-a) for more information.
+A> It is possible to use different executors by specifying them in the project's `project.json` configuration file.
 
 So far we haven't been diligent about verifying that our changes are okay, so unsurprisingly our tests are failing.
-
-![`nx affected:test` failed](images/3-failed-test.png)
-
-![`nx affected:e2e` failed](images/3-failed-e2e.png)
 
 I'll leave it to you as an exercise to fix the broken unit and e2e tests. A hint for the `App` component test, you should look into the `MemoryRouter` from React Router.
 
@@ -191,7 +185,7 @@ For the full solution please see the bookstore example repository: https://githu
 
 There are three additional affected commands in Nx.
 
-1. `nx affected:build` - Builds only the affected apps. We'll go over build and deployment in [Chapter 5](#chapter-5).
+1. `nx affected:build` - Builds only the affected applications and libraries.
 2. `nx affected:apps` - Lists out all applications affected by the changeset.  
 3. `nx affected:libs` - Lists out all libraries affected by the changeset.
 
@@ -206,10 +200,10 @@ So far our `bookstore` application does not communicate with a real backend serv
 We'll need to install the `@nrwl/express` collection first.
 
 ```bash
-yarn add --dev @nrwl/express
+npm install --save-dev @nrwl/express
 ```
 
-Then we can do a dry run of the express app schematic.
+Then we can do a dry run of the express app generator.
 
 ```bash
 nx g @nrwl/express:app api \
@@ -304,7 +298,7 @@ const server = app.listen(port, () => {
 server.on('error', console.error);
 ```
 
-Finally, let's update our data-access library to call the proxy endpoint.
+Let's update our data-access library to call the proxy endpoint.
 
 **libs/books/data-access/src/lib/books-data-access.ts**
 
@@ -319,7 +313,9 @@ export async function getBooks() {
 }
 ```
 
-If we restart both applications (`nx serve api` and `nx serve bookstore`) we'll see that our [bookstore](http://localhost:4200) is still working in the browser. Moreover, we can verify that our `/api/books` endpoint is indeed being called.
+If we restart both applications (`nx serve api` and `nx serve bookstore`; or in a single command ` nx run-many --target=serve --projects=api,bookstore`)
+we'll see that our [bookstore](http://localhost:4200) is still working in the browser. Moreover, we can verify that our `/api/books` endpoint is indeed
+being called.
 
 ![](images/3-api-verify.png)
 
@@ -457,8 +453,6 @@ nx format:check
 # Formats files with Prettier.
 nx format:write
 ```
-
-Lastly, you may want to set up a pre-commit git hook to run `nx format:write` so we can ensure 100% conformance whenever code is checked in. For more details please refer to [Appendix B](#appendix-b). 
 
 ***
 

@@ -72,13 +72,13 @@ export async function checkout(cart: ICart): Promise<{ sucess: boolean }> {
 
 ### Managing cart state using Redux Toolkit
 
-The cart state will contain multiple sub-values (cart items, status flag, etc.), and we'll also need to communicate with the API endpoint. To help use manage this complexity, we can take advantage of [Redux Toolkit](https://redux-toolkit.js.org/). Luckily, Nx comes with a schematic to help set this up. 
+The cart state will contain multiple sub-values (cart items, status flag, etc.), and we'll also need to communicate with the API endpoint. To help use manage this complexity, we can take advantage of [Redux Toolkit](https://redux-toolkit.js.org/). Luckily, Nx comes with a generator to help set this up. 
 
 ```bash
 nx g redux cart --project=cart-data-access --appProject=bookstore
 ```
 
-Here, we are creating a new Redux slice `cart` in the `cart-data-access` library that we created previously. As well, the schematic will install the necessary npm packages for Redux Toolkit, add configure the store in `bookstore` app, and add the `cart` slice.
+Here, we are creating a new Redux slice `cart` in the `cart-data-access` library that we created previously. As well, the generator will install the necessary npm packages for Redux Toolkit, add configure the store in `bookstore` app, and add the `cart` slice.
 
 When the command completes, open up `apps/bookstore/src/main.tsx` and you'll see the following.
 
@@ -148,7 +148,7 @@ export const cartAdapter = createEntityAdapter<CartEntity>();
  *
  * e.g.
  * \```
- * import React, { useEffect } from 'react';
+ * import { useEffect } from 'react';
  * import { useDispatch } from 'react-redux';
  *
  * // ...
@@ -213,7 +213,7 @@ export const cartReducer = cartSlice.reducer;
  *
  * e.g.
  * \```
- * import React, { useEffect } from 'react';
+ * import { useEffect } from 'react';
  * import { useDispatch } from 'react-redux';
  *
  * // ...
@@ -402,7 +402,6 @@ Something like this should do.
 **libs/cart/feature/src/lib/cart-feature.tsx**
 
 ```typescript
-import React from 'react';
 import styled from 'styled-components';
 import { Button } from '@acme/ui';
 import { useDispatch, useSelector } from 'react-redux';
@@ -495,7 +494,7 @@ Let's update the `BooksFeature` component as follows.
 **libs/cart/feature/src/lib/books-feature.tsx**
 
 ```typescript
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@acme/books/data-access';
 import { Books } from '@acme/books/ui';
@@ -544,10 +543,10 @@ nx serve bookstore
 
 Open up `http://localhost:4200` and you should be able go through the full workflow: Add books to cart, navigate to the Cart page, remove books from cart, and then check out.
 
-![](./images/4-flow-1.png)
-![](./images/4-flow-2.png)
-![](./images/4-flow-3.png)
-![](./images/4-flow-4.png)
+![](images/4-flow-1.png)
+![](images/4-flow-2.png)
+![](images/4-flow-3.png)
+![](images/4-flow-4.png)
 
 Looking good! However, we're not quite yet finished. Don't forget about our tests!
 
@@ -555,6 +554,96 @@ Looking good! However, we're not quite yet finished. Don't forget about our test
 nx affected:test
 ```
 
-Tests are broken, so please fix them up. If you do get stuck though, you may refer to the solution repository: https://github.com/jaysoo/nx-react-book-example. 
+Tests are broken, so please fix them up. If you do get stuck though, you may refer to the solution repository: https://github.com/nrwl/nx-react-book-example. 
 
-You've made it this far! Now might be a good time to take a quick break. In the next chapter we will switch gears from feature development and look at how we can leverage Nx for CI and deployment.
+You've made it this far! Now is a good time to commit our progress before looking at production builds: `git add .; git commit -m  'add cart feature''`.
+
+## Building for production
+
+Now that we have completed our features we can build the frontend and backend apps for running in production.
+
+```bash
+nx build api
+nx build bookstore
+```
+
+You can also use `nx run-many --target=build --projects=api,bookstore` to build using a single command.
+
+When both build succeed you will see the following output in the `dist` folder.
+
+```
+dist
+└── apps
+    ├── api
+    │   ├── assets
+    │   ├── main.js
+    │   └── main.js.map
+    └── bookstore
+        ├── 3rdpartylicenses.txt
+        ├── assets
+        ├── favicon.ico
+        ├── index.html
+        ├── main.fc726d4f52fe3ea5.esm.js
+        ├── main.fc726d4f52fe3ea5.esm.js.LICENSE.txt
+        ├── polyfills.7e0034cfe0406d00.esm.js
+        └── runtime.bdc91b7b4b12a0bf.esm.js
+```
+
+You can run the backend application using Node, and the frontend application using any static file server solution.
+
+e.g.
+
+```
+# Run the backend
+node dist/apps/main.js
+
+# Run the frontend
+npx serve dist/apps/bookstore
+```
+
+You'll notice issues with `/api` not being available from the frontend app. There are many ways to solve this, but for the sake of simplicity we will serve the frontend app through the API server. 
+
+Update the server code with the following.
+
+**apps/api/src/main.ts**
+
+```typescript
+// ...
+
+const port = process.env.port || 3333;
+const server = app.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}/api`);
+});
+
+// Serve built frontend app
+app.use(express.static(path.join(__dirname, '../bookstore')))
+
+// Handle browser-side routes
+app.get('*', function(req, res) {
+    res.sendFile('index.html', {root: path.join(__dirname, '../bookstore')});
+});
+
+server.on('error', console.error);
+```
+
+Now rebuild the API and serve.
+
+```
+nx build api
+node dist/apps/api/main.js
+```
+
+Browse to http://localhost:3333, and you'll see the application running in production mode!
+
+![](images/4-final.png)
+
+You've now reached the end of this book. There are much more Nx features that we didn't cover. For example,
+
+- Computation caching
+- Distributed task execution
+- Workspace generators
+- And much more!
+
+To learn more about Nx's features please visit the documentation website at [nx.dev](https://nx.dev).
+
+
