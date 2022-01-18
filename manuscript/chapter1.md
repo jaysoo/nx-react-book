@@ -4,7 +4,7 @@
 Let's start by going through the terminology that Nx uses.
 
 **Workspace**
-: A folder created using Nx that contain applications and libraries, as well as scaffolding to help with building, linting, and testing.
+: A folder created using Nx that contains applications and libraries, as well as scaffolding to help with building, linting, and testing.
 
 **Project**
 : An application or library within the workspace.
@@ -22,10 +22,10 @@ Now, let's create our workspace.
 You can create the workspace as follows:
 
 ```bash
-npx create-nx-workspace
+npx create-nx-workspace@latest
 ```
 
-I> Note: The `npx` binary comes bundled with NodeJS. It allows you to conveniently install then run a Node binary.
+I> Note: The `npx` binary comes bundled with NodeJS. It allows you to conveniently install then run a Node binary without the need to install it globally.
 
 Nx will ask you for a **workspace name**. Let's use `acme` as it is the name of our imaginary organization. The workspace name is used by Nx to scope our libraries, just like [npm scoped packages](https://docs.npmjs.com/misc/scope).
 
@@ -33,9 +33,16 @@ Next, you'll be prompted to select a **preset**--choose the `react` option.
 
 ![Creating a workspace](images/1-create-workspace.png)
 
-Lastly, you'll be prompted for the application name, and the styling format you want to use. Let's use `bookstore` as our application name and `styled-components` for styling.
+After choosing the preset, you'll be prompted for the application name, and the styling format you want to use. Let's use `bookstore` as our application name and `styled-components` for styling.
 
 ![Choosing  a style option](images/1-choose-style.png)
+
+In addition, Nx asks about setting up Nx Cloud[^nxcloud]. Nx Cloud adds remote distributed computation caching and other performance enhancing features to the Nx workspace. Even though it is the commercial addon for Nx, it comes with a generous free tier. So feel free to go ahead and enable it or skip it entirely.
+
+[^nxcloud]: [https://nx.app](https://nx.app)
+
+
+I> Note: If you prefer Yarn over npm, you can pass the `--packageManager=yarn` flag to the `create-nx-workspace`.
 
 Once Nx finishes creating the workspace, we will end up with something like this:
 
@@ -43,15 +50,16 @@ Once Nx finishes creating the workspace, we will end up with something like this
 .
 ├── apps
 │   ├── bookstore
-│   │   ├── jest.config.js
 │   │   ├── src
+│   │   ├── jest.config.js
+│   │   ├── project.json
 │   │   ├── tsconfig.app.json
 │   │   ├── tsconfig.json
 │   │   └── tsconfig.spec.json
 │   └── bookstore-e2e
-│       ├── cypress.json
 │       ├── src
-│       ├── tsconfig.e2e.json
+│       ├── cypress.json
+│       ├── project.json
 │       └── tsconfig.json
 ├── libs
 ├── babel.config.json
@@ -68,26 +76,28 @@ Once Nx finishes creating the workspace, we will end up with something like this
 └── workspace.json
 ```
 
-The `apps` folder contain the code of all applications in our workspace. Nx has created two applications by default:
+The `apps` folder contains the code of all applications in our workspace. Nx has created two applications by default:
 
 - The `bookstore` application itself; and 
-- A set of end-to-end (E2E) tests written to test `bookstore` application using Cypress.
+- A set of end-to-end (E2E) tests written to test the `bookstore` application using Cypress[^cypresslink].
+
+[^cypresslink]: [https://www.cypress.io/](https://www.cypress.io/)
 
 The `libs` folder will eventually contain our libraries (more on that in [Chapter 2](#chapter-2)). It is empty for now.
 
 The `tools` folder can be used for scripts that are specific to the workspace. The generated `tools/generators` folder 
 is for Nx's [workspace generators](https://nx.dev/generators/workspace-generators) feature which you can learn more about
-by reading the documentation (https://nx.dev/generators/workspace-generators).
+by reading the documentation at https://nx.dev/generators/workspace-generators.
 
-The `nx.json` file configures Nx (as we'll see in [Chapter 4](#chapter-4)).
+The `nx.json` file configures Nx. We're going to have a closer look at that in [Chapter 4](#chapter-4).
 
 To serve the application, use this command:
 
 ```bash
-nx serve bookstore
+npm start
 ```
 
-The above command will build the `bookstore` application, then start a development server at port 4200.
+The above command uses the `start` script in the main `package.json` which builds the `bookstore` application and then starts a development server at port 4200.
  
 When we navigate to <http://localhost:4200> we are presented with a friendly welcome page.
 
@@ -100,6 +110,9 @@ Nx comes with a set of targets that can be executed on our projects. You run a t
 For example, for our `bookstore` app we can run the following targets.
 
 ```bash
+# Serve the app
+npx nx serve bookstore
+
 # Run a linter for the application
 npx nx lint bookstore
 
