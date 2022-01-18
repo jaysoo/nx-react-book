@@ -17,6 +17,8 @@ nx dep-graph
 
 Nx knows the dependency graph of the workspace without us having to configure anything. Because of this ability, Nx also understands which projects within the workspace are affected by any given changeset. Moreover, it can help us verify the correctness of the  affected projects.
 
+I> Note that you can also manually add so-called "implicit dependencies" for those rare cases where there needs to be a dependency which however can not be computed from source code. Read more about that here: https://nx.dev/configuration/projectjson#implicitdependencies
+
 ## Understanding and verifying changes
 
 Let's say we want to add a **checkout** button to each of the books in the list.
@@ -169,7 +171,7 @@ nx affected:e2e
 
 Nx topologically sorts the projects such that they are run from bottom to top. That is, projects at the bottom of the dependency chain run first. We're also using the `--parallel` option to enable Nx to run our projects in parallel.
 
-All of the `affected:*` commands use `main` as the default base branch. This default branch can be changed by updating the `defaultBase` in the `nx.json` file. You can also pass the `--base` option to override it for a single run.
+All of the `affected:*` commands use the Git history, comparing the current HEAD with a "base" to determine which Nx project(s) got changed. By default "base" refers to the `main` branch. You can customize that by either passing the `--base` flag to the command or by changing the `defaultBase` property in `nx.json`.
 
 A> Note that in these projects, Nx is using [Jest](https://jestjs.io) and [Cypress](https://www.cypress.io/) to run unit and e2e tests respectively. They make writing and running tests are fast and simple as possible. If you're not familiar with them, please read their documentation to learn more.
 A>
@@ -313,8 +315,7 @@ export async function getBooks() {
 }
 ```
 
-If we restart both applications (`nx serve api` and `nx serve bookstore`; or in a single command ` nx run-many --target=serve --projects=api,bookstore`)
-we'll see that our [bookstore](http://localhost:4200) is still working in the browser. Moreover, we can verify that our `/api/books` endpoint is indeed
+If we restart both applications (`nx serve api` and `nx serve bookstore`; or in a single command `nx run-many --target=serve --projects=api,bookstore`) we'll see that our [bookstore](http://localhost:4200) is still working in the browser. Moreover, we can verify that our `/api/books` endpoint is indeed
 being called.
 
 ![](images/3-api-verify.png)
@@ -439,7 +440,7 @@ Another major benefit of working within a monorepo is that we can check in these
 
 ## Automatic code formatting
 
-One of the easiest ways to waste time as a developer is on code style. We can spend time *hours* debating with one another on whether we should use semicolons or not--you should; or whether we should use a comma-first style or not--you shouldn't.
+One of the easiest ways to waste time as a developer is on code style. We can spend *hours* debating with one another on whether we should use semicolons or not (you should); or whether we should use a comma-first style or not (you should not).
 
 [Prettier](https://prettier.io) was created to stop these endless debates over code style. It is highly opinionated and provides minimal configuration options. Best of all, it can format our code *automatically*. This means that we no longer need to manually fix code to conform to the code style.
 
