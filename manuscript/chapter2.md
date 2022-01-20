@@ -3,9 +3,62 @@
 
 We have the skeleton of our application from [Chapter 1](#chapter-1).
 
-So now we can start adding to our application by creating and using libraries.
+So now we can start adding to our application by creating and using libraries. Before we dive straight into creating libraries, though, let's first understand the concept of libraries in an Nx workspace.
 
-## Types of libraries
+## Apps and Libs
+
+A typical Nx workspace is structured into "apps" and "libs". This separation helps facilitate more modular architectures by following a separation of concerns methodology, incentivising the organisation of your source code and logic into smaller, more focused and highly cohesive units.
+
+Nx automatically creates TypeScript path mappings in the `tsconfig.base.json`, such that they can be easily consumed by other apps or libs. More on that later.
+
+```typescript
+// example of importing from another workspace library
+import { Button } from '@acme/ui'
+...
+```
+
+As a result, consuming libraries is very straightforward, and similar to what you might already be accustomed to in your current setup, where you structure code within folders of your React application project. Having a dedicated library project is a much stronger boundary compared to just separating code into folders, though. Each Nx library has a so-called "public API", represented by a `index.ts` barrel file. This forces developers into an "API thinking" of what should be exposed and thus be made available for others to consume, and what on the others side should remain private within the library itself.
+
+I> 80% of the logic should reside in libraries, 20% in apps.
+
+A common mental model is to see the application as "containers" that link, bundle and compile functionality implemented in libraries for being deployed. As such, if we follow a 80/20 approach: place 80% of your logic into the `libs/` folder, and 20% into `apps/`.
+
+Note, these libraries don't necessarily need to be built separately, but are rather consumed and built by the application itself directly. Hence, nothing changes from a pure deployment point of view. That said, it is totally possible to create so-called "buildable libraries" for enabling incremental builds[^incrementalbuilds] as well as "publishable libraries" for those scenarios where not only you want to use a specific library within the current Nx workspace, but also to publish it to some package repository (e.g NPM). You can read more about buildable and publishable libraries on the official Nx docs[^buildablelibs].
+
+[^buildablelibs]: <https://nx.dev/structure/buildable-and-publishable-libraries>
+[^incrementalbuilds]: <https://nx.dev/ci/incremental-builds>
+
+### Organizing Libraries
+
+Developers new to Nx are initially often hesitant to move their logic into libraries, because they assume it implies that those libraries need to be general purpose and shareable across applications. This is a common misconception. Moving code into libraries can be done from a pure code organization perspective. 
+
+I> Ease of re-use might emerge as a positive side-effect of refactoring code into libraries by applying an "API thinking" approach. It is not the main driver though.
+
+In fact when organizing libraries you should think about your business domains. Most often teams are aligned with those domains and thus a similar organization of the libraries in the `libs` folder might be most appropriate. Nx allows to nest libraries into sub-folders which makes it easy to reflect such structuring.
+
+```
+.
+├── (...)
+├── libs
+│   └── books
+│   │   └── feature
+│   │   │  ├── src
+│   │   │  ├── ...
+│   │   │  └── ...
+│   │   └── ui
+│   │       ├── src
+│   │       ├── ...
+│   │       └── ...
+│   └── ui
+│       ├── src
+│       ├── ...
+│       └── ...
+└── (...)
+```
+
+Note how we might have a `libs/books/feature` and `libs/books/ui` library, both of which are specific libraries for the `books` domain, while `libs/ui` represents a more general purpose library of UI elements such as a common UI design system that can be used across all of the other domains. Applying such a nested structure can be powerful to organize your workspace as well as for applying code ownership rules as we'll see later.
+
+### Categories of libraries
 
 In a workspace, libraries are typically divided into four different types:
 
