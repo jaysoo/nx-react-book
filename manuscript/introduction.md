@@ -8,7 +8,7 @@ A few problems that arise from a multi-repository setup include:
 
 - Lack of collaboration because sharing code is hard and expensive.
 - Lack of consistency in linting, testing, and release processes.
-- Lack of developer mobility between projects because access may be unavailable or the development experience vary too greatly.
+- Lack of developer mobility between projects because access may be unavailable or the development experience varies too greatly.
 - Difficulty in coordinating changes across repositories.
 - Late discovery of bugs because they can only occur at the point of integration rather than when code is changed.
 
@@ -16,35 +16,17 @@ A few problems that arise from a multi-repository setup include:
 
 A lot of successful organizations such as Google, Facebook, and Microsoft--and also large open source projects such as Babel, Jest, and React--are all using the monorepo approach to software development.
 
-As you will see in this book, a monorepo approach when done correctly can save developers from a great deal of headache and wasted time.
+As you will see in this book, a monorepo approach - when done correctly - can save developers from a great deal of headache and wasted time.
 
 ## Why Nx?
 
-Nx is a smart and extensible framework that helps teams build applications at any scale. It integrates with modern frameworks
-and libraries, provides computation caching and smart rebuilds, as well as power code generators.
+Nx is a fast, smart and extensible build system that helps teams develop applications at any scale. It integrates with modern frameworks and libraries, provides computation caching and smart rebuilds, as well as code generators.
 
 ## Is this book for you?
 
-Because Nx creates TypeScript source code by default, it helps to know some basics such as type annotations, and interfaces.
-
-```typescript
-// Here's a number variable
-let x: number;
-
-// Here's an interface
-interface Foo {
-  bar: string;
-}
-
-// Using the interface
-const y: Foo = {
-  bar: 'Hello'
-};
-```
-
-Don't fret if this is your first introduction to TypeScript. We will not be using any advanced TypeScript features so a good working knowledge of modern JavaScript is more than enough.
-
 This book assumes that you have prior experience working with React, so it does not go over any of the basics. We will also make light use of the Hooks API, however understanding it is not necessary to grasp the concepts in this book.
+
+Nx generates TypeScript code by default, so we'll be using that in our examples throughout the book. Don't fret if this is your first introduction to TypeScript. We will not be using any advanced TypeScript features so a good working knowledge of modern JavaScript is more than enough.
 
 Consequently, this book might be for you if:
 
@@ -57,16 +39,16 @@ Consequently, this book might be for you if:
 On the other hand, this book might not be for you if:
 
 - You are already proficient at using Nx with React and this book may not teach you anything new.
-- You *hate* monorepos so much that you cannot stand looking at them.
+- You _hate_ monorepos so much that you cannot stand looking at them.
 
-Okay, the last bullet point is a bit of a joke, but there are common concerns regarding monorepos in practice. 
+Okay, the last bullet point is a bit of a joke, but there are common concerns regarding monorepos in practice.
 
 ## Common concerns regarding monorepos
 
 There are a few common concerns that people may have when they consider using a monorepo.
 
 - Continuous integration (CI) is slow
-- "Everyone can change *my* code"
+- "Everyone can change _my_ code"
 - Teams losing their autonomy
 
 All three of these issues will be addressed throughout this book.

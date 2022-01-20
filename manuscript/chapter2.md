@@ -190,10 +190,9 @@ nx g lib ui --no-interactive
 
 The `--no-interactive` tells Nx to not prompt us with options, but instead use the default values.
 
-Please note that we will make heavy use of [`styled-components`](https://www.styled-components.com) in this component library. Don't fret if you're not familiar with `styled-components`. If you know CSS then you should not have a problem understanding this section. To learn more about `styled-components` you can check our their [documentation](https://www.styled-components.com/docs/basics).
+I> Please note that we will make heavy use of [`styled-components`](https://www.styled-components.com) in this component library. Don't fret if you're not familiar with `styled-components`. If you know CSS then you should not have a problem understanding this section. To learn more about `styled-components` you can check our their [documentation](https://www.styled-components.com/docs/basics).
 
-
-Back to the example. You should have a new folder: `libs/ui`.
+You should have a new folder: `libs/ui`.
 
 ```
 acme
@@ -236,9 +235,7 @@ Next, let's go over the implementation of each of the components and what their 
 
 ### `GlobalStyles`
 
-This component injects a global stylesheet into our application when used.
-
-This component is useful for overriding global style rules such as `body { margin: 0 }`.
+This component injects a global stylesheet into our application when used. It is particularly useful for overriding global style rules such as `body { margin: 0 }`.
 
 **libs/ui/src/lib/global-styles/global-styles.tsx**
 
@@ -409,6 +406,8 @@ Now we can use the new library in our `bookstore`'s app component.
 import { Link, Redirect, Route } from 'react-router-dom';
 
 import { BooksFeature } from '@acme/books/feature';
+
+// importing the UI library into our App
 import {
   GlobalStyles,
   Header,
@@ -537,7 +536,7 @@ The next step is to use the `getBooks` function within our `books` feature. We c
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@acme/books/data-access';
-import { Books, Book } from '@acme/books/ui';
+import { Books } from '@acme/books/ui';
 
 export const BooksFeature = () => {
   const [books, setBooks] = useState<any[]>([]);
@@ -569,6 +568,8 @@ nx g component Book --project books-ui --export
 ```
 
 We generally want to put *presentational* components into their own UI library. This will prevent side-effects from bleeding into them, thus making them easier to understand and test.
+
+I> Note how we generate a new `books-ui` library under `libs/books/ui` rather than using the already existing `ui` library under `libs/ui`. The reason is that the former contains specific presentational components for the books feature of our workspace, while the latter contains the general purpose UI components that form our corporate design system components.
 
 Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
  
@@ -652,8 +653,14 @@ That's great and all, but you may have observed a couple of problems.
 1. The `getBooks` data-access function is a stub and doesn't actually call out to a backend service.
    
 2. We've been using `any` types when dealing with books data. For example, the return type of `getBooks` is `any[]` and our `BookProp` takes specifies `{ book: any }`. This makes our code unsafe and can lead to production bugs.
-   
-We'll address both problems in the [next chapter](#chapter-3).
+
+For now, let's commit our changes and then we'll address both problems in the [next chapter](#chapter-3).
+
+
+```bash
+git add .
+git commit -m 'implement books feature and link to application'
+```
 
 ***
 
