@@ -636,14 +636,3 @@ node dist/apps/api/main.js
 Browse to http://localhost:3333, and you'll see the application running in production mode!
 
 ![](images/4-final.png)
-
-You've now reached the end of this book. There are much more Nx features that we didn't cover. For example,
-
-- Computation caching
-- Distributed task execution
-- Workspace generators
-- And much more!
-
-To learn more about Nx's features please visit the documentation website at [nx.dev](https://nx.dev).
-
-
