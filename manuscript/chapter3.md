@@ -17,9 +17,9 @@ nx dep-graph
 
 Nx knows the dependency graph of the workspace without us having to configure anything. Because of this ability, Nx also understands which projects within the workspace are affected by any given changeset. Moreover, it can help us verify the correctness of the  affected projects.
 
-I> Note that you can also manually add so-called "implicit dependencies" for those rare cases where there needs to be a dependency which however can not be computed from source code. Read more about that here: https://nx.dev/configuration/projectjson#implicitdependencies
+I> Note that you can also manually add so-called "implicit dependencies" for those rare cases where there needs to be a dependency which can not be automatically inferred from source code. Read more about that here: https://nx.dev/configuration/projectjson#implicitdependencies
 
-## Understanding and verifying changes
+## Only recompute affected projects
 
 Let's say we want to add a **checkout** button to each of the books in the list.
 
@@ -141,7 +141,9 @@ export const BooksFeature = () => {
 export default BooksFeature;
 ```
 
-We can ask Nx to show us how this change *affects* the projects within our workspace.
+By leveraging the dependency graph, Nx is not only able to understand how the workspace projects relate to each other, but combining this with the Git history, Nx is able to determine which projects got affected by a given changeset.
+
+We can ask Nx to show us how this change *affects* the projects within our workspace using the so-called "affected command".
 
 ```bash
 nx affected:dep-graph
@@ -149,27 +151,27 @@ nx affected:dep-graph
 
 ![Affected dependencies](images/3-affected-dep-graph.png)
 
-As we can see, Nx knows that the `books-ui` library has changed from the main branch; it indicates the dependent projects affected by this change in *red*. Furthermore, Nx also allows us to re-test only the affected projects.
+As we can see, Nx knows that the `books-ui` library has changed starting from the Git `main` branch. Using this information, Nx walks up the dependency graph and highlights all the dependent projects affected by this change in *red*. 
 
-We can **lint** the projects affected by the changeset. 
-
-```bash
-nx affected:lint --parallel
-```
-
-Or run **unit tests** for the affected projects.
+But there is more. We cannot just visualize this change, but use various commands to run only against this affected set of projects. Hence we can just re-test, re-lint or re-build what changed.
 
 ```bash
-nx affected:test --parallel
-```
+// build only the affected apps
+nx affected:build
 
-Or even run **e2e tests** for the affected projects.
+// run unit tests on affected projects
+nx affected:test
 
-```bash
+// run linting on affected projects
+nx affected:lint
+
+// run e2e tests on affected projects
 nx affected:e2e
 ```
 
-Nx topologically sorts the projects such that they are run from bottom to top. That is, projects at the bottom of the dependency chain run first. We're also using the `--parallel` option to enable Nx to run our projects in parallel.
+Nx topologically sorts the projects such that they are run from bottom to top. That is, projects at the bottom of the dependency chain run first. All these tasks are also parallelized by default (you can customize the amount of parallel tasks using `--maxParallel`).
+
+I> Nx uses 3 parallel tasks by default. You can customize the amount using the `--maxParallel` flag.
 
 All of the `affected:*` commands use the Git history, comparing the current HEAD with a "base" to determine which Nx project(s) got changed. By default "base" refers to the `main` branch. You can customize that by either passing the `--base` flag to the command or by changing the `defaultBase` property in `nx.json`.
 
@@ -185,17 +187,72 @@ I> **Pro-Tip:** You can run a target for an individual project by issuing `nx [t
 
 For the full solution please see the bookstore example repository: https://github.com/jaysoo/nx-react-book-example.
 
-There are three additional affected commands in Nx.
+There are some additional affected commands in Nx.
 
-1. `nx affected:build` - Builds only the affected applications and libraries.
-2. `nx affected:apps` - Lists out all applications affected by the changeset.  
-3. `nx affected:libs` - Lists out all libraries affected by the changeset.
+1. `nx affected:apps` - Lists out all applications affected by the changeset.  
+2. `nx affected:libs` - Lists out all libraries affected by the changeset.
 
 The listing of affected applications and libraries can be useful in CI to trigger downstream jobs based on the output.
 
+## Computation Caching
+
+When you heavily adopt a monorepo and the number of projects grows, you need to start thinking about scaling. We have already seen how Nx can cut down the amount of projects to recompute drastically by using the previously mentioned "affected" commands.
+
+Nx goes a step further by also using a computation cache. Basically before running any task, Nx calculates its computation hash. As long as the hash is the same, the output of running the task will be the same.
+
+Let's take the example of running a unit test for an application `app1`. By default the computation hash includes
+
+- All the source files of `app1` and its dependencies
+- Relevant global configuration
+- Versions of external dependencies
+- Runtime values provisioned by the user such as the version of Node
+- CLI Command flags
+
+![Calculating the computation cache](images/3-computation-hashing.png)
+
+While this is the default behavior, it can also be customized to more specific needs. For instance, lint checks may only depend on the source code of the project and global configs. Or similarly, builds may depend on the dts files of the compiled libs instead of their source.
+
+Once Nx has the computation hash, it verifies whether that specific hash already exists in its cache. If it does, it replays the task's output in the terminal and restores all possible files in the right folders. From a developers perspective it looks like the task was just run, simply a lot faster.
+
+Try it out by yourself by running unit tests for the `books-feature` project. Run it once and then again to see it being restored from the cache the 2nd time.
+
+```bash
+// run unit tests
+nx test books-feature
+
+// run them again, they should be restored from the cache
+nx test books-feature
+```
+
+Every Nx workspace has the computation caching enabled by default. Nx stores the cache locally in the `node_modules/.cache/nx` folder. You can customize which operations get cached as well as the exact location of the cache folder in the `nx.json` file under the `taskRunnerOptions` field.
+
+```json
+{
+  ...
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/workspace/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"]
+      }
+    }
+  },
+}
+```
+
+You can get even more benefits if this cache is not only local, but remotely distributed. Such functionality can be enabled by using Nx Cloud[^nxcloud].
+
+![Remote caching with Nx Cloud](images/3-cloud-cache.png)
+
+If Nx Cloud is enabled, the local cache folder will simply be synched with a cloud-hosted counterpart. In that way other team members, but also CI agents can benefit from it too and drastically reduce the required computation time. Learn more on <https://nx.app> and the corresponding Nx Cloud docs at <https://nx.app/docs>.
+
+[^nxcloud]: <https://nx.app>
+
+
+
 ## Adding the API application
 
-By the way, now is a good time to commit your changes if you haven't done so already: `git add . ; git commit -m 'added checkout button'`.
+It's time to get more practical again and commit your changes if you haven't done so already: `git add . ; git commit -m 'added checkout button'`.
 
 So far our `bookstore` application does not communicate with a real backend service. Let's create one using the [Express](https://expressjs.com) framework.
 
