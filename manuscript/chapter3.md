@@ -141,7 +141,7 @@ export const BooksFeature = () => {
 export default BooksFeature;
 ```
 
-By leveraging the dependency graph, Nx is not only able to understand how the workspace projects relate to each other, but combining this with the Git history, Nx is able to determine which projects got affected by a given changeset.
+By leveraging the dependency graph, Nx is not only able to understand how the workspace projects relate to each other, but combining this with the Git history, Nx is able to determine which projects were affected by a given changeset.
 
 We can ask Nx to show us how this change *affects* the projects within our workspace using the so-called "affected command".
 
@@ -244,7 +244,7 @@ You can get even more benefits if this cache is not only local, but remotely dis
 
 ![Remote caching with Nx Cloud](images/3-cloud-cache.png)
 
-If Nx Cloud is enabled, the local cache folder will simply be synched with a cloud-hosted counterpart. In that way other team members, but also CI agents can benefit from it too and drastically reduce the required computation time. Learn more on <https://nx.app> and the corresponding Nx Cloud docs at <https://nx.app/docs>.
+If Nx Cloud is enabled, the local cache folder will be synched with a cloud-hosted counterpart. In that way other team members, but also CI agents can benefit from it too and drastically reduce the required computation time. Learn more on <https://nx.app> and the corresponding Nx Cloud docs at <https://nx.app/docs>.
 
 [^nxcloud]: <https://nx.app>
 
