@@ -4,7 +4,7 @@ If you've ever worked at a company with more than one team, chances are you've h
 
 In a typical work setting, development teams are divided by domain or technology. For example, one team building the UI in React, and another one building the API in Express. These teams usually have their own code repositories, so changes to the software as a whole requires juggling multiple repositories.
 
-A few problems that arise from a multi-repository setup include:
+A few problems that arise from a multi-repository (often called "Polyrepo") setup include:
 
 - Lack of collaboration because sharing code is hard and expensive.
 - Lack of consistency in linting, testing, and release processes.
@@ -16,7 +16,18 @@ A few problems that arise from a multi-repository setup include:
 
 A lot of successful organizations such as Google, Facebook, and Microsoft--and also large open source projects such as Babel, Jest, and React--are all using the monorepo approach to software development.
 
-As you will see in this book, a monorepo approach - when done correctly - can save developers from a great deal of headache and wasted time.
+What is a monorepo though? A monorepo is a single repository containing multiple distinct projects, where we don't just have code collocation, but well-defined relationships among these projects. As you will see in this book, a monorepo approach - when done correctly - can save developers from a great deal of headache and wasted time. 
+
+Still there are quite some misconceptions when it comes to monorepos.
+
+- Monorepos are monolithic and not for building microservices and microfrontends[^monoreposnotmonoliths]
+- Continuous integration (CI) is slow
+- "Everyone can change _my_ code"
+- Teams losing their autonomy
+
+All of the above will be addressed throughout this book.
+
+[^monoreposnotmonoliths]: <https://blog.nrwl.io/misconceptions-about-monorepos-monorepo-monolith-df1250d4b03c>
 
 ## Why Nx?
 
@@ -42,16 +53,6 @@ On the other hand, this book might not be for you if:
 - You _hate_ monorepos so much that you cannot stand looking at them.
 
 Okay, the last bullet point is a bit of a joke, but there are common concerns regarding monorepos in practice.
-
-## Common concerns regarding monorepos
-
-There are a few common concerns that people may have when they consider using a monorepo.
-
-- Continuous integration (CI) is slow
-- "Everyone can change _my_ code"
-- Teams losing their autonomy
-
-All three of these issues will be addressed throughout this book.
 
 ## How this book is laid out
 
