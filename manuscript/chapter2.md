@@ -58,6 +58,7 @@ In fact when organizing libraries you should think about your business domains. 
 
 Note how we might have a `libs/books/feature` and `libs/books/ui` library, both of which are specific libraries for the `books` domain, while `libs/ui` represents a more general purpose library of UI elements such as a common UI design system that can be used across all of the other domains. Applying such a nested structure can be powerful to organize your workspace as well as for applying code ownership rules as we'll see later.
 
+{#lib-categories}
 ### Categories of libraries
 
 In a workspace, libraries are typically divided into four different types:
@@ -78,7 +79,7 @@ Why do we make these distinctions between libraries? Good question! It is good t
 
 More concretely, we can form rules about what each types of libraries can depend on. For example, UI libraries cannot use feature or data-access libraries, because doing so will mean that they are effectful.
 
-We'll see in [the next chapter](#chapter-3) how we can use Nx to strictly enforce these boundaries.
+We'll see in later in this chapter how we can use Nx to strictly enforce these boundaries.
 
 ## The `generate` command
 
@@ -91,12 +92,15 @@ Let's create our first feature library: `books`.
 ```bash
 nx g lib feature \
 --directory books \
---appProject bookstore
+--appProject bookstore \
+--tags  type:feature,scope:books
 ```
 
 The `--directory` option allows us to group our libraries by nesting them under their parent directory. In this case the library is created in the `libs/books/feature` folder. It is aliased to `-d`.
 
 The `--appProject` option lets Nx know that we want to make our feature library to be routable inside the specified application. This option is useful because Nx will do three things for us.
+
+The `--tags` option lets us annotate our applications and libraries to express constraints within the workspace. The tags are added to `project.json`, and we'll see at the end of this chapter how they can be used to enforce different constraints.
 
 1. Update `apps/bookstore/src/app/app.tsx` with the new route.
 2. Update `apps/bookstore/src/main.tsx` to add `BrowserRouter` if it does not exist yet.
@@ -238,7 +242,9 @@ Let's remedy this situation by adding a component library that will provide bett
 Let's create the UI library.
 
 ```bash
-nx g lib ui --no-interactive
+nx g lib ui \
+--tags type:ui,scope:books \
+--no-interactive
 ```
 
 The `--no-interactive` tells Nx to not prompt us with options, but instead use the default values.
@@ -268,12 +274,12 @@ acme
 This library isn't quite useful yet, so let's add in some components.
 
 ```bash
-nx g component GlobalStyles --project ui --export
-nx g component Button --project ui --export
-nx g component Header --project ui --export
-nx g component Main --project ui --export
-nx g component NavigationList --project ui --export
-nx g component NavigationItem --project ui --export
+nx g component GlobalStyles --project ui --export --tags type:ui,scope:books
+nx g component Button --project ui --export --tags type:ui,scope:books
+nx g component Header --project ui --export --tags type:ui,scope:books
+nx g component Main --project ui --export --tags type:ui,scope:books
+nx g component NavigationList --project ui --export --tags type:ui,scope:books
+nx g component NavigationItem --project ui --export --tags type:ui,scope:books
 ```
 
 The `--project` option specifies which project (as found in the `projects` section of `workspace.json`) to add the new component to. It is aliased to `-p`.
@@ -510,7 +516,7 @@ That's great, but we are still not seeing any books, so let's do something about
 What we want to do is fetch data from *somewhere* and display that in our books feature. Since we will be calling a backend service we should create a new **data-access** library.
 
 ```bash
-nx g @nrwl/web:lib data-access --directory books
+nx g @nrwl/web:lib data-access --directory books --tags type:data-access,scope:books
 ``` 
 
 You may have noticed that we are using a prefix `@nrwl/web:lib` instead of just `lib` like in our previous examples. This `@nrwl/web:lib` syntax means that we want Nx to run the `lib` (or `library`) generator provided by the `@nrwl/web` collection.
@@ -624,7 +630,7 @@ We generally want to put *presentational* components into their own UI library. 
 
 I> Note how we generate a new `books-ui` library under `libs/books/ui` rather than using the already existing `ui` library under `libs/ui`. The reason is that the former contains specific presentational components for the books feature of our workspace, while the latter contains the general purpose UI components that form our corporate design system components.
 
-Again, we will see in [Chapter 3](#chapter-3) how Nx enforces module boundaries.
+Again, we will see later in this chapter how Nx enforces module boundaries.
  
 **libs/books/ui/src/lib/books/books.tsx**
 
@@ -707,8 +713,150 @@ That's great and all, but you may have observed a couple of problems.
    
 2. We've been using `any` types when dealing with books data. For example, the return type of `getBooks` is `any[]` and our `BookProp` takes specifies `{ book: any }`. This makes our code unsafe and can lead to production bugs.
 
-For now, let's commit our changes and then we'll address both problems in the [next chapter](#chapter-3).
+We'll address both problems in the [next chapter](#chapter-3). For now, let's wrap up by examining how Nx can enforce module boundaries between different types of libraries that we've created in this chapter.
 
+## Enforcing module boundaries
+
+Recall that earlier, when we generated our libraries we passed the `--tags` option to define a _type_ and _scope_ for each of them. Let's examine how we can use these tags to define and enforce clean separation of concerns within the workspace.
+
+Open up the `.eslintrc.json` file at the root of your workspace. It will contain an entry for `@nrwl/nx/enforce-module-boundaries` as follows.
+
+```json
+"@nrwl/nx/enforce-module-boundaries": [
+  "error",
+  {
+    "depConstraints": [
+      {
+        "sourceTag": "*",
+        "onlyDependOnLibsWithTags": ["*"]
+      }
+    ],
+    "allow": [],
+    "enforceBuildableLibDependency": true
+  }
+]
+```
+
+The `depConstraints` section is the one you will be spending most time fine-tuning. It is an array of constraints, each consisting of `sourceTag` and `onlyDependOnLibsWithTags` properties. The default configuration has a wildcard `*` set as a value for both of them, meaning that any project can import (depend on) any other project.
+
+The circular dependency chains such as `lib A -> lib B -> lib C -> lib A` are also not allowed. The self circular dependency (when lib imports from a named alias of itself), while not recommended, can be overridden by setting the flag `allowCircularSelfDependency` to true.
+
+```json
+"@nrwl/nx/enforce-module-boundaries": [
+  "error",
+  {
+   "allowCircularSelfDependency": true,
+    ...
+  }
+]
+```
+
+The `allow` array is a whitelist listing the import definitions that should be omitted from further checks. We will see how overrides work after we define the `depConstraints` section.
+
+Finally, the flag `enforceBuildableLibDependency` prevents us from importing a non-buildable library into a buildable one.
+
+### Using tags to enforce boundaries
+
+Earlier in this chapter we presented [four categories of libraries](#lib-categories) we typically find in a Nx workspace.
+
+1. Feature
+2. UI
+3. Data-access
+4. Utility
+
+We've already added these types as tags to our libraries when we ran the generate command (e.g. `--tags type:ui`). We also want to consider a fifth type of project in the workspace: `type:app` that we can tag all of our applications with.
+
+Now, let's define some constraints for what each types of projects can depend on.
+
+* Applications can  depend on any types of libraries, but not other applications.
+* Feature libraries can depend on any other library.
+* UI libraries can only depend on other UI or utility libraries.
+* Utility libraries can only depend on other utility libraries.
+
+Let's see how we can configure the ESLint rule to enforce the above constraints.
+
+```json
+"@nrwl/nx/enforce-module-boundaries": [
+  "error",
+  {
+    ...
+    "depConstraints": [
+      {
+        "sourceTag": "type:app",
+        "onlyDependOnLibsWithTags": ["type:feature", "type:ui", "type:util"]
+      },
+      {
+        "sourceTag": "type:feature",
+        "onlyDependOnLibsWithTags": ["type:feature", "type:ui", "type:util"]
+      },
+      {
+        "sourceTag": "type:ui",
+        "onlyDependOnLibsWithTags": ["type:ui", "type:util"]
+      },
+      {
+        "sourceTag": "type:util",
+        "onlyDependOnLibsWithTags": ["type:util"]
+      }
+    ]
+  }
+]
+```
+
+Further, recall that we also have a second dimension to the tags of our libraries (e.g. `--tag scope:books`). The `scope` tag allows us to separate our applications and libraries into logical domains.
+
+Imagine that we want to add an **admin** application to our workspace in order to manage our books. We can create such application with `nx g app admin --tags type:app,scope:admin`. It is likely that there will be some shared libraries required by both **admin** and **books** applications.
+
+For example, if we have common components--such as buttons, modals, etc.-- then we can generate a shared library as follows.
+
+```bash
+nx g lib ui --directory shared --tags type:ui,scope:shared
+```
+
+And we want to enforce the following rules for scopes.
+
+* Book application and libraries can only depend on `scope:books` libraries.
+* Admin application and libraries can only depend on `scope:admin` libraries.
+* _Any_ applications and libraries can depend on `scope:shared` libraries.
+ 
+This is how we would define the constraints.
+
+```json
+"@nrwl/nx/enforce-module-boundaries": [
+  "error",
+  {
+    ...
+    "depConstraints": [
+      {
+        "sourceTag": "type:app",
+        "onlyDependOnLibsWithTags": ["type:feature", "type:ui", "type:util"]
+      },
+      ...
+      {
+        "sourceTag": "scope:books",
+        "onlyDependOnLibsWithTags": ["scope:shared", "scope:books"]
+      },
+      {
+        "sourceTag": "scope:admin",
+        "onlyDependOnLibsWithTags": ["scope:shared", "scope:admin"]
+      },
+      {
+        "sourceTag": "scope:shared",
+        "onlyDependOnLibsWithTags": ["scope:shared"]
+      }
+    ]
+  }
+]
+```
+
+By forbidding cross-scope dependencies we can prevent a feature from `admin` being used in the `books` application. Also, domain-specific logic can be safely guarded against being used in the wrong domains.
+
+These module boundaries are needed as the workspace grows, otherwise projects will become unmanageable, and changes will be hard to reason about. You can customize the tags however you want. If you have a multi-platform monorepo, you might add `platform:web`, `platform:node`,  `platform:native`, and `platform:all` tags.
+
+Learn more about configuring boundaries with the Taming Code Organization with Module Boundaries in Nx article[^masteringboundaries].
+
+[^masteringboundaries]: https://blog.nrwl.io/mastering-the-project-boundaries-in-nx-f095852f5bf4
+
+Finally, let's commit our changes up to this point before moving on to the next chapter.
 
 ```bash
 git add .
@@ -724,3 +872,5 @@ T>
 T> Nx provides us with the `nx generate` or `nx g` command to *quickly* create new libraries from scratch.
 T>
 T> When running `nx g` we can optionally provide a collection such as `@nrwl/web:lib` as opposed to `lib`. This will tell Nx to use the generator from that specific collection rather than the default as set in `nx.json`. 
+T>
+T> Nx enforces module boundaries through tags and `@nrwl/nx/enforce-module-boundaries` ESLint rule. The boundaries allow us to better organize and manage our workspace.

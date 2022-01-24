@@ -153,7 +153,7 @@ nx affected:dep-graph
 
 As we can see, Nx knows that the `books-ui` library has changed starting from the Git `main` branch. Using this information, Nx walks up the dependency graph and highlights all the dependent projects affected by this change in *red*. 
 
-But there is more. We cannot just visualize this change, but use various commands to run only against this affected set of projects. Hence we can just re-test, re-lint or re-build what changed.
+But there is more. We can not only just visualize this change, but we can use various commands to run only against this affected set of projects. Hence, we can just re-test, re-lint or re-build what changed.
 
 ```bash
 // build only the affected apps
@@ -244,11 +244,9 @@ You can get even more benefits if this cache is not only local, but remotely dis
 
 ![Remote caching with Nx Cloud](images/3-cloud-cache.png)
 
-If Nx Cloud is enabled, the local cache folder will be synched with a cloud-hosted counterpart. In that way other team members, but also CI agents can benefit from it too and drastically reduce the required computation time. Learn more on <https://nx.app> and the corresponding Nx Cloud docs at <https://nx.app/docs>.
+If Nx Cloud is enabled, the local cache folder will be synced with a cloud-hosted, remote counterpart. With the remote cache, other team members and CI agents can read from it too and drastically reduce the required computation time. Learn more on <https://nx.app> and the corresponding Nx Cloud docs at <https://nx.app/docs>.
 
 [^nxcloud]: <https://nx.app>
-
-
 
 ## Adding the API application
 
