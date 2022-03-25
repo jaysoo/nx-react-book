@@ -121,7 +121,7 @@ The previously generated workspace comes with the follow Nx specific configurati
 - `workspace.json`
 - `project.json`
 
-The `nx.json` is at the root of the workspace and configures the Nx CLI. It allows to specify things such as defaults for projects and code scaffolding, the workspace layout, task runner options and computation cache configuration and more. Here's an excerpt of what got generated for our example workspace.
+The `nx.json` is at the root of the workspace and configures the Nx CLI. It allows to specify things such as defaults for projects and code scaffolding, the workspace layout, task runner options and computation cache configuration and more. Here's an excerpt of what is generated for our example workspace.
 
 ```json
 {
@@ -155,16 +155,6 @@ The `nx.json` is at the root of the workspace and configures the Nx CLI. It allo
       }
     ]
   },
-  "generators": {
-    "@nrwl/react": {
-      "application": {
-        "style": "styled-components",
-        "linter": "eslint",
-        "babel": true
-      },
-      ...
-    }
-  },
   ...
 }
 ```
@@ -193,48 +183,27 @@ It contains targets for invoking a `build`, `serve` for serving the app during d
 Each of these targets comes with a set of things that can be configured. Let's have a look at the `build` target:
 
 ```json
-{
-  ...
-  "targets": {
-    "build": {
-      "executor": "@nrwl/web:webpack",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "compiler": "babel",
-        "outputPath": "dist/apps/bookstore",
-        "index": "apps/bookstore/src/index.html",
-        "baseHref": "/",
-        "main": "apps/bookstore/src/main.tsx",
-        "polyfills": "apps/bookstore/src/polyfills.ts",
-        "tsConfig": "apps/bookstore/tsconfig.app.json",
-        "assets": [
-          "apps/bookstore/src/favicon.ico",
-          "apps/bookstore/src/assets"
-        ],
-        "styles": [],
-        "scripts": [],
-        "webpackConfig": "@nrwl/react/plugins/webpack"
-      },
-      "configurations": {
-        "production": {
-          "fileReplacements": [
-            {
-              "replace": "apps/bookstore/src/environments/environment.ts",
-              "with": "apps/bookstore/src/environments/environment.prod.ts"
-            }
-          ],
-          "optimization": true,
-          "outputHashing": "all",
-          "sourceMap": false,
-          "namedChunks": false,
-          "extractLicenses": true,
-          "vendorChunk": false
-        }
-      }
-    },
-    ...
+"build": {
+  "executor": "@nrwl/web:webpack",
+  "outputs": ["{options.outputPath}"],
+  "options": {
+    "compiler": "babel",
+    "outputPath": "dist/apps/bookstore",
+    "index": "apps/bookstore/src/index.html",
+    "baseHref": "/",
+    "main": "apps/bookstore/src/main.tsx",
+    "polyfills": "apps/bookstore/src/polyfills.ts",
+    "tsConfig": "apps/bookstore/tsconfig.app.json",
+    "assets": [
+      "apps/bookstore/src/favicon.ico",
+      "apps/bookstore/src/assets"
+    ],
+    "styles": [],
+    "scripts": [],
+    "webpackConfig": "@nrwl/react/plugins/webpack"
   },
-  ...
+  "configurations": { ... }
+},
 }
 ```
 
@@ -307,7 +276,7 @@ import styled from 'styled-components';
 
 const StyledApp = styled.div``;
 
-export const App = () => {
+export function App() {
   return (
     <StyledApp>
       <header>

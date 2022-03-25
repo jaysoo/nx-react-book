@@ -139,18 +139,17 @@ You'll also see that the `App` component for `bookstore` has been updated to inc
 
 ```typescript
 import styled from 'styled-components';
-
 import { Route, Link } from 'react-router-dom';
-
 import { BooksFeature } from '@acme/books/feature';
+
 const StyledApp = styled.div``;
-export const App = () => {
+
+export function App() {
   return (
     <StyledApp>
       <header>
         <h1>Bookstore</h1>
       </header>
-
       {/* START: routes */}
       {/* These routes and navigation have been generated for you */}
       {/* Feel free to move and update them to fit your needs */}
@@ -159,37 +158,14 @@ export const App = () => {
       <br />
       <div role="navigation">
         <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/feature">BooksFeature</Link>
-          </li>
-          <li>
-            <Link to="/page-2">Page 2</Link>
-          </li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/feature">BooksFeature</Link></li>
+          <li><Link to="/page-2">Page 2</Link></li>
         </ul>
       </div>
-      <Route
-        path="/"
-        exact
-        render={() => (
-          <div>
-            This is the generated root route.{' '}
-            <Link to="/page-2">Click here for page 2.</Link>
-          </div>
-        )}
-      />
+      <Route path="/" exact render={...} />
       <Route path="/feature" component={BooksFeature} />
-      <Route
-        path="/page-2"
-        exact
-        render={() => (
-          <div>
-            <Link to="/">Click here to go back to root page.</Link>
-          </div>
-        )}
-      />
+      <Route path="/page-2" exact render={...} />
       {/* END: routes */}
     </StyledApp>
   );
@@ -339,7 +315,7 @@ const StyledButton = styled.button`
   }
 `;
 
-export const Button = ({
+export function Button({
   children,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement>) => {
@@ -382,7 +358,7 @@ const StyledHeader = styled.header`
   }
 `;
 
-export const Header = (props: HTMLAttributes<HTMLElement>) => (
+export function Header(props: HTMLAttributes<HTMLElement>) (
   <StyledHeader>{props.children}</StyledHeader>
 );
 
@@ -401,7 +377,7 @@ const StyledMain = styled.main`
   max-width: 960px;
 `;
 
-export const Main = (props: HTMLAttributes<HTMLElement>) => (
+export function Main(props: HTMLAttributes<HTMLElement>) (
   <StyledMain>{props.children}</StyledMain>
 );
 
@@ -427,7 +403,7 @@ const StyledNavigationList = styled.div`
   }
 `;
 
-export const NavigationList = (props: HTMLAttributes<HTMLElement>) => {
+export function NavigationList(props: HTMLAttributes<HTMLElement>) {
   return (
     <StyledNavigationList role="navigation">
       <ul>{props.children}</ul>
@@ -448,7 +424,7 @@ const StyledNavigationItem = styled.li`
   margin-right: 1rem;
 `;
 
-export const NavigationItem = (props: LiHTMLAttributes<HTMLLIElement>) => {
+export function NavigationItem(props: LiHTMLAttributes<HTMLLIElement>) {
   return <StyledNavigationItem>{props.children}</StyledNavigationItem>;
 };
 
@@ -475,7 +451,7 @@ import {
   NavigationList
 } from '@acme/ui';
 
-export const App = () => {
+export function App() {
   return (
     <>
       <GlobalStyles />
@@ -597,7 +573,7 @@ import styled from 'styled-components';
 import { getBooks } from '@acme/books/data-access';
 import { Books } from '@acme/books/ui';
 
-export const BooksFeature = () => {
+export function BooksFeature() {
   const [books, setBooks] = useState<any[]>([]);
 
   useEffect(() => {
@@ -647,7 +623,7 @@ const StyledBooks = styled.div`
   border-radius: 4px;
 `;
 
-export const Books = ({ books }: BooksProps) => {
+export function Books({ books }: BooksProps) {
   return (
     <StyledBooks>
       {books.map(book => (
@@ -689,7 +665,7 @@ const StyledBook = styled.div`
   }
 `;
 
-export const Book = ({ book }: BookProps) => {
+export function Book({ book }: BookProps) {
   return (
     <StyledBook>
       <span className="title">

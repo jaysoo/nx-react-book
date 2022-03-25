@@ -27,7 +27,7 @@ We can update our `Book`, `Books`, and `BooksFeature` components to pass along a
 
 **libs/books/ui/src/lib/book/book.tsx**
 
-```
+```typescript 
 import styled from 'styled-components';
 import { Button } from '@acme/ui';
 
@@ -59,7 +59,7 @@ const StyledBook = styled.div`
   }
 `;
 
-export const Book = ({ book, onAdd }: BookProps) => {
+export function Book({ book, onAdd }: BookProps) {
   const handleAdd = () => onAdd(book);
   return (
     <StyledBook>
@@ -96,7 +96,7 @@ const StyledBooks = styled.div`
   border-radius: 4px;
 `;
 
-export const Books = ({ books, onAdd }: BooksProps) => {
+export function Books({ books, onAdd }: BooksProps) {
   return (
     <StyledBooks>
       {books.map(book => (
@@ -118,7 +118,7 @@ import styled from 'styled-components';
 import { getBooks } from '@acme/books/data-access';
 import { Books, Book } from '@acme/books/ui';
 
-export const BooksFeature = () => {
+export function BooksFeature() {
   const [books, setBooks] = useState<any[]>([]);
 
   useEffect(() => {
@@ -227,16 +227,13 @@ nx test books-feature
 Every Nx workspace has the computation caching enabled by default. Nx stores the cache locally in the `node_modules/.cache/nx` folder. You can customize which operations get cached as well as the exact location of the cache folder in the `nx.json` file under the `taskRunnerOptions` field.
 
 ```json
-{
-  ...
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "@nrwl/workspace/tasks-runners/default",
-      "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"]
-      }
+"tasksRunnerOptions": {
+  "default": {
+    "runner": "@nrwl/workspace/tasks-runners/default",
+    "options": {
+      "cacheableOperations": ["build", "lint", "test", "e2e"]
     }
-  },
+  }
 }
 ```
 
@@ -311,7 +308,7 @@ app.get('/api/books', (req, res) => {
   const books: any[] = [
     {
       id: 1,
-      title: 'The Picture of Dorian Gray ',
+      title: 'The Picture of Dorian Gray',
       author: 'Oscar Wilde',
       rating: 5,
       price: 9.99
@@ -436,7 +433,7 @@ export async function getBooks(): Promise<IBook[]> {
 ...
 import { IBook } from '@acme/shared-models';
 
-export const BooksFeature = () => {
+export function BooksFeature() {
   // Properly type the array
   const [books, setBooks] = useState<IBook[]>([]);
 

@@ -362,7 +362,7 @@ The guesses made by Nx may not be correct, so let's make sure we have the proper
 ```typescript
 // ...
 
-export const App = () => {
+export function App() {
   return (
     <>
       <GlobalStyles />
@@ -433,7 +433,7 @@ const StyledCartFeature = styled.div`
   }
 `;
 
-export const CartFeature = () => {
+export function CartFeature() {
   const dispatch = useDispatch();
   const cartItems = useSelector(selectCartItems);
   const status = useSelector(selecteCartStatus);
@@ -445,8 +445,7 @@ export const CartFeature = () => {
       <h1>My Cart</h1>
       {order ? (
         <p>
-          Thank you for ordering. Your order number is <strong>#{order}</strong>
-          .
+          Thank you for ordering. Your order number is <strong>#{order}</strong>.
         </p>
       ) : (
         <>
@@ -502,13 +501,11 @@ import { IBook } from '@acme/shared-models';
 import { useDispatch } from 'react-redux';
 import { cartActions } from '@acme/cart/data-access';
 
-export const BooksFeature = () => {
+export function BooksFeature() {
   const [books, setBooks] = useState<IBook[]>([]);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    getBooks().then(setBooks);
-  }, []);
+  useEffect(() => getBooks().then(setBooks), []);
 
   return (
     <>
