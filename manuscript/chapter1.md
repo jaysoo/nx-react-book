@@ -203,17 +203,19 @@ Each of these targets comes with a set of things that can be configured. Let's h
     "webpackConfig": "@nrwl/react/plugins/webpack"
   },
   "configurations": { ... }
-},
 }
 ```
 
-Each target comes with a Nx Executor[^nxexecutor] definition: `@nrwl/web:webpack`. An executor is a program (in this case named `webpack` and located in the `@nrwl/web` package) that is used to run the target. In this specific case it will use Webpack to create the application build. By abstracting the details of how the built is created into an executor, it takes away the burden of configuring Webpack and allows Nx to automatically handle Webpack upgrades and optimizations in an automated fashion, without breaking your workspace. That said, flexibility is still preserved. The executor comes with options to merge in your own Webpack options and you can totally also create your own custom executor[^customexecutor].
+Each target comes with a Nx Executor[^nxexecutor] definition:  
+`@nrwl/web:webpack`. An executor is a program (in this case named `webpack` and located in the `@nrwl/web` package) that is used to run the target. In this specific case it will use Webpack to create the application build. By abstracting the details of how the built is created into an executor, it takes away the burden of configuring Webpack and allows Nx to automatically handle Webpack upgrades and optimizations in an automated fashion, without breaking your workspace. That said, flexibility is still preserved. The executor comes with options to merge in your own Webpack options and you can totally also create your own custom executor[^customexecutor].
 
 [^nxexecutor]: [https://nx.dev/executors/using-builders](https://nx.dev/executors/using-builders)
 [^customexecutor]: [https://nx.dev/executors/creating-custom-builders](https://nx.dev/executors/creating-custom-builders)
 
 The target comes also with `options` that are read by the executor to customize the outcome accordingly. Depending on the executor implementation the target is using, these options might vary.  
-Finally there's the `configurations` which extends the `options` and potentially overrides them with different values. This can be handy when building for different environments. Configurations can be activate by passing the `--configuration=<name>` flag to the command.
+
+Finally, there's the `configurations` which extends the `options` and potentially overrides them with different values. This can be handy when building for different environments. Configurations can be activated by passing the  
+`--configuration=<name>` flag to the command.  
 
 ## Nx commands
 

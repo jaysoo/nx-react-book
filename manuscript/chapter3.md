@@ -17,7 +17,7 @@ nx dep-graph
 
 Nx knows the dependency graph of the workspace without us having to configure anything. Because of this ability, Nx also understands which projects within the workspace are affected by any given changeset. Moreover, it can help us verify the correctness of the  affected projects.
 
-I> Note that you can also manually add so-called "implicit dependencies" for those rare cases where there needs to be a dependency which can not be automatically inferred from source code. Read more about that here: https://nx.dev/configuration/projectjson#implicitdependencies
+I> Note that you can also manually add so-called "implicit dependencies" for those rare cases where there needs to be a dependency which can not be automatically inferred from source code. Read more about that here: <https://nx.dev/configuration/projectjson#implicitdependencies>
 
 ## Only recompute affected projects
 
@@ -113,7 +113,7 @@ export default Books;
 **libs/books/feature/src/lib/books-feature.tsx**
 
 ```typescript
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@acme/books/data-access';
 import { Books, Book } from '@acme/books/ui';
@@ -121,19 +121,23 @@ import { Books, Book } from '@acme/books/ui';
 export function BooksFeature() {
   const [books, setBooks] = useState<any[]>([]);
 
+  const hasFetched = useRef(false);
   useEffect(() => {
-    getBooks().then(setBooks);
-  }, [
-    // This effect runs only once on first component render
-    // so we declare it as having no dependent state.
-  ]);
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      getBooks().then(setBooks);
+    }
+  }, []);
 
   return (
     <>
       <h2>Books</h2>
       {/* Pass a stub callback for now */}
       {/* We'll implement this properly in Chapter 4 */}
-      <Books books={books} onAdd={book => alert(`Added ${book.title}`)} />
+      <Books
+        books={books} 
+        onAdd={book => alert(`Added ${book.title}`)} 
+      />
     </>
   );
 };
@@ -185,7 +189,8 @@ I'll leave it to you as an exercise to fix the broken unit and e2e tests. A hint
 
 I> **Pro-Tip:** You can run a target for an individual project by issuing `nx [target] [project]` such as `nx test books-ui`, `nx test bookstore`, or `nx e2e bookstore-e2e`. You may also pass the `--watch` flag to re-run tests as soon there is a code change.
 
-For the full solution please see the bookstore example repository: https://github.com/jaysoo/nx-react-book-example.
+For the full solution please see the bookstore example repository:  
+<https://github.com/jaysoo/nx-react-book-example>.
 
 There are some additional affected commands in Nx.
 

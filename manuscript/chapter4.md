@@ -58,7 +58,9 @@ The cart data-access library should provide a `checkout` function we can use in 
 ```typescript
 import { ICart } from '@acme/shared-models';
 
-export async function checkout(cart: ICart): Promise<{ sucess: boolean }> {
+export async function checkout(
+  cart: ICart
+): Promise<{ sucess: boolean }> {
   const data = await fetch('/api/checkout', {
     method: 'POST',
     headers: {
@@ -78,16 +80,24 @@ The cart state will contain multiple sub-values (cart items, status flag, etc.),
 nx g redux cart --project=cart-data-access --appProject=bookstore
 ```
 
-Here, we are creating a new Redux slice `cart` in the `cart-data-access` library that we created previously. As well, the generator will install the necessary npm packages for Redux Toolkit, add configure the store in `bookstore` app, and add the `cart` slice.
+Here, we are creating a new Redux slice `cart` in the  
+`cart-data-access` library that we created previously. As well, the generator will install the necessary npm packages for Redux Toolkit, add configure the store in `bookstore` app, and add the `cart` slice.
 
-When the command completes, open up `apps/bookstore/src/main.tsx` and you'll see the following.
+When the command completes, open up  
+`apps/bookstore/src/main.tsx` and you'll see the following.
 
 ```typescript
 // ...
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { 
+  configureStore, 
+  getDefaultMiddleware 
+} from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 
-import { CART_FEATURE_KEY, cartReducer } from '@acme/cart/data-access';
+import {
+  CART_FEATURE_KEY, 
+  cartReducer 
+} from '@acme/cart/data-access';
 
 const store = configureStore({
   reducer: { [CART_FEATURE_KEY]: cartReducer },
@@ -144,7 +154,8 @@ export const cartAdapter = createEntityAdapter<CartEntity>();
 
 /**
  * Export an effect using createAsyncThunk from
- * the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
+ * the Redux Toolkit: 
+ * https://redux-toolkit.js.org/api/createAsyncThunk
  *
  * e.g.
  * \```
@@ -171,7 +182,8 @@ export const fetchCart = createAsyncThunk(
   }
 );
 
-export const initialCartState: CartState = cartAdapter.getInitialState({
+export const initialCartState: CartState = 
+cartAdapter.getInitialState({
   loadingStatus: 'not loaded',
   error: null,
 });
@@ -191,7 +203,10 @@ export const cartSlice = createSlice({
       })
       .addCase(
         fetchCart.fulfilled,
-        (state: CartState, action: PayloadAction<CartEntity[]>) => {
+        (
+          state: CartState, 
+          action: PayloadAction<CartEntity[]>
+        ) => {
           cartAdapter.setAll(state, action.payload);
           state.loadingStatus = 'loaded';
         }
@@ -209,7 +224,8 @@ export const cartSlice = createSlice({
 export const cartReducer = cartSlice.reducer;
 
 /*
- * Export action creators to be dispatched. For use with the `useDispatch` hook.
+ * Export action creators to be dispatched. 
+ * For use with the `useDispatch` hook.
  *
  * e.g.
  * \```
@@ -229,7 +245,8 @@ export const cartReducer = cartSlice.reducer;
 export const cartActions = cartSlice.actions;
 
 /*
- * Export selectors to query state. For use with the `useSelector` hook.
+ * Export selectors to query state. 
+ * For use with the `useSelector` hook.
  *
  * e.g.
  * \```
@@ -247,9 +264,15 @@ const { selectAll, selectEntities } = cartAdapter.getSelectors();
 export const getCartState = (rootState: unknown): CartState =>
   rootState[CART_FEATURE_KEY];
 
-export const selectAllCart = createSelector(getCartState, selectAll);
+export const selectAllCart = createSelector(
+  getCartState, 
+  selectAll
+);
 
-export const selectCartEntities = createSelector(getCartState, selectEntities);
+export const selectCartEntities = createSelector(
+  getCartState, 
+  selectEntities
+);
 ```
 
 If you're not familiar with Redux Toolkit, you'll notice a few new utilities.
@@ -285,12 +308,14 @@ export interface CartState extends EntityState<ICartItem> {
 
 export const cartAdapter = createEntityAdapter<ICartItem>();
 
-export const checkoutCart = createAsyncThunk<{ order: string }, ICartItem[]>(
-  'cart/checkoutStatus',
-  (items) => checkout({ items })
-);
+export const checkoutCart = 
+  createAsyncThunk<{ order: string }, ICartItem[]>(
+    'cart/checkoutStatus',
+    (items) => checkout({ items })
+  );
 
-export const initialCartState: CartState = cartAdapter.getInitialState({
+export const initialCartState: CartState = 
+  cartAdapter.getInitialState({
   cartStatus: 'ready',
   error: null,
 });
@@ -307,11 +332,17 @@ export const cartSlice = createSlice({
       .addCase(checkoutCart.pending, (state: CartState) => {
         state.cartStatus = 'pending';
       })
-      .addCase(checkoutCart.fulfilled, (state: CartState, action) => {
+      .addCase(checkoutCart.fulfilled, (
+        state: CartState, 
+        action
+      ) => {
         state.order = action.payload.order;
         state.cartStatus = 'ordered';
       })
-      .addCase(checkoutCart.rejected, (state: CartState, action) => {
+      .addCase(checkoutCart.rejected, (
+        state: CartState, 
+        action
+      ) => {
         state.cartStatus = 'error';
         state.error = action.error.message;
       });
@@ -327,17 +358,20 @@ const { selectAll } = cartAdapter.getSelectors();
 export const getCartState = (rootState: unknown): CartState =>
   rootState[CART_FEATURE_KEY];
 
-export const selectCartItems = createSelector(getCartState, selectAll);
+export const selectCartItems = 
+  createSelector(getCartState, selectAll);
 
-export const selecteCartStatus = createSelector(
-  getCartState,
-  (state) => state.cartStatus
-);
+export const selecteCartStatus = 
+  createSelector(
+    getCartState,
+    (state) => state.cartStatus
+  );
 
-export const selectOrderNumber = createSelector(
-  getCartState,
-  (state) => state.order
-);
+export const selectOrderNumber = 
+  createSelector(
+    getCartState,
+    (state) => state.order
+  );
 
 export const selectTotal = createSelector(selectCartItems, (items) =>
   items.reduce((total, item) => total + item.cost, 0)
@@ -378,9 +412,20 @@ export function App() {
         </NavigationList>
       </Header>
       <Main>
-        <Route path="/books" component={BooksFeature} />
-        <Route path="/cart" component={CartFeature} />
-        <Route exact path="/" render={() => <Redirect to="/books" />} />
+        <Routes>
+          <Route
+            path="/books" 
+            element={<BooksFeature/>} 
+          />
+          <Route 
+            path="/cart"
+            element={<CartFeature/>}
+          />
+          <Route path="/"
+            element={<Navigate to="/books"/>}
+          >
+          </Route>
+        </Routes>
       </Main>
     </>
   );
@@ -445,7 +490,8 @@ export function CartFeature() {
       <h1>My Cart</h1>
       {order ? (
         <p>
-          Thank you for ordering. Your order number is <strong>#{order}</strong>.
+          Thank you for ordering. 
+          Your order number is <strong>#{order}</strong>.
         </p>
       ) : (
         <>
@@ -453,10 +499,16 @@ export function CartFeature() {
           <div>
             {cartItems.map((item) => (
               <div className="item" key={item.id}>
-                <span className="description">{item.description}</span>
-                <span className="cost">${item.cost.toFixed(2)}</span>
+                <span className="description">
+                  {item.description}
+                </span>
+                <span className="cost">
+                  ${item.cost.toFixed(2)}
+                </span>
                 <span className="action">
-                  <Button onClick={() => dispatch(cartActions.remove(item.id))}>
+                  <Button onClick={() => {
+                    dispatch(cartActions.remove(item.id));
+                  }}>
                     Remove
                   </Button>
                 </span>
@@ -564,7 +616,11 @@ nx build api
 nx build bookstore
 ```
 
-You can also use `nx run-many --target=build --projects=api,bookstore` to build using a single command.
+You can also use the following to build with a single command:
+
+```
+nx run-many --target=build --projects=api,bookstore
+```
 
 When both build succeed you will see the following output in the `dist` folder.
 
@@ -617,7 +673,10 @@ app.use(express.static(path.join(__dirname, '../bookstore')))
 
 // Handle browser-side routes
 app.get('*', function(req, res) {
-    res.sendFile('index.html', {root: path.join(__dirname, '../bookstore')});
+    res.sendFile(
+      'index.html',
+      {root: path.join(__dirname, '../bookstore')}
+    );
 });
 
 server.on('error', console.error);

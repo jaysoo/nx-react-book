@@ -139,7 +139,7 @@ You'll also see that the `App` component for `bookstore` has been updated to inc
 
 ```typescript
 import styled from 'styled-components';
-import { Route, Link } from 'react-router-dom';
+import { Routes, Route, Link } from 'react-router-dom';
 import { BooksFeature } from '@acme/books/feature';
 
 const StyledApp = styled.div``;
@@ -147,25 +147,22 @@ const StyledApp = styled.div``;
 export function App() {
   return (
     <StyledApp>
-      <header>
-        <h1>Bookstore</h1>
-      </header>
-      {/* START: routes */}
-      {/* These routes and navigation have been generated for you */}
-      {/* Feel free to move and update them to fit your needs */}
-      <br />
-      <hr />
-      <br />
+        {/* snip */}
       <div role="navigation">
         <ul>
           <li><Link to="/">Home</Link></li>
           <li><Link to="/feature">BooksFeature</Link></li>
           <li><Link to="/page-2">Page 2</Link></li>
         </ul>
-      </div>
-      <Route path="/" exact render={...} />
-      <Route path="/feature" component={BooksFeature} />
-      <Route path="/page-2" exact render={...} />
+      </div> 
+      <Routes>
+        <Route path="/" element={...} />
+        <Route
+          path="/feature"
+          element={<BooksFeature/>}
+        />
+        <Route path="/page-2" element={...} />
+      </Routes>
       {/* END: routes */}
     </StyledApp>
   );
@@ -177,19 +174,21 @@ Additionally, the `main.tsx` file for `bookstore` has also been updated to rende
 
 ```typescript
 import { StrictMode } from 'react';
-import * as ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom/client';
 
 import App from './app/app';
 
 import { BrowserRouter } from 'react-router-dom';
 
-ReactDOM.render(
-    <StrictMode>
-        <BrowserRouter>
-            <App />
+const root = ReactDOM.createRoot(
+  document.getElementById('root')
+);
+root.render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
     </BrowserRouter>
-    </StrictMode>,
-document.getElementById('root')
+  </StrictMode>,
 );
 ```
 
@@ -250,12 +249,23 @@ acme
 This library isn't quite useful yet, so let's add in some components.
 
 ```bash
-nx g component GlobalStyles --project ui --export --tags type:ui,scope:books
-nx g component Button --project ui --export --tags type:ui,scope:books
-nx g component Header --project ui --export --tags type:ui,scope:books
-nx g component Main --project ui --export --tags type:ui,scope:books
-nx g component NavigationList --project ui --export --tags type:ui,scope:books
-nx g component NavigationItem --project ui --export --tags type:ui,scope:books
+nx g component GlobalStyles --project ui\
+ --export --tags type:ui,scope:books
+ 
+nx g component Button --project ui \
+--export --tags type:ui,scope:books
+
+nx g component Header --project ui \
+--export --tags type:ui,scope:books
+
+nx g component Main --project ui \
+--export --tags type:ui,scope:books
+
+nx g component NavigationList --project ui \
+--export --tags type:ui,scope:books
+
+nx g component NavigationItem --project ui \
+--export --tags type:ui,scope:books
 ```
 
 The `--project` option specifies which project (as found in the `projects` section of `workspace.json`) to add the new component to. It is aliased to `-p`.
@@ -403,7 +413,9 @@ const StyledNavigationList = styled.div`
   }
 `;
 
-export function NavigationList(props: HTMLAttributes<HTMLElement>) {
+export function NavigationList(
+  props: HTMLAttributes<HTMLElement>
+) {
   return (
     <StyledNavigationList role="navigation">
       <ul>{props.children}</ul>
@@ -424,8 +436,14 @@ const StyledNavigationItem = styled.li`
   margin-right: 1rem;
 `;
 
-export function NavigationItem(props: LiHTMLAttributes<HTMLLIElement>) {
-  return <StyledNavigationItem>{props.children}</StyledNavigationItem>;
+export function NavigationItem(
+  props: LiHTMLAttributes<HTMLLIElement>
+) {
+  return (
+    <StyledNavigationItem>
+      {props.children}
+    </StyledNavigationItem>
+  ) ;
 };
 
 export default NavigationItem;
@@ -438,7 +456,12 @@ Now we can use the new library in our `bookstore`'s app component.
 **apps/bookstore/src/app/app.tsx**
 
 ```typescript
-import { Link, Redirect, Route } from 'react-router-dom';
+import {
+  Link, 
+  Navigate, 
+  Routes, 
+  Route 
+} from 'react-router-dom';
 
 import { BooksFeature } from '@acme/books/feature';
 
@@ -464,8 +487,16 @@ export function App() {
         </NavigationList>
       </Header>
       <Main>
-        <Route path="/books" component={BooksFeature} />
-        <Route exact path="/" render={() => <Redirect to="/books" />} />
+        <Routes>
+          <Route 
+            path="/books" 
+            element={<BooksFeature/>}
+          />
+          <Route path="/" 
+            element={<Navigate to="/books" />}
+          >
+          </Route>
+        </Routes>
       </Main>
     </>
   );
@@ -492,7 +523,9 @@ That's great, but we are still not seeing any books, so let's do something about
 What we want to do is fetch data from *somewhere* and display that in our books feature. Since we will be calling a backend service we should create a new **data-access** library.
 
 ```bash
-nx g @nrwl/web:lib data-access --directory books --tags type:data-access,scope:books
+nx g @nrwl/web:lib data-access \
+--directory books \
+--tags type:data-access,scope:books
 ``` 
 
 You may have noticed that we are using a prefix `@nrwl/web:lib` instead of just `lib` like in our previous examples. This `@nrwl/web:lib` syntax means that we want Nx to run the `lib` (or `library`) generator provided by the `@nrwl/web` collection.
@@ -727,7 +760,8 @@ The circular dependency chains such as `lib A -> lib B -> lib C -> lib A` are al
 ]
 ```
 
-The `allow` array is a whitelist listing the import definitions that should be omitted from further checks. We will see how overrides work after we define the `depConstraints` section.
+The `allow` array is a whitelist listing the import definitions that should be omitted from further checks. We will see how overrides work after we define the  
+`depConstraints` section.
 
 Finally, the flag `enforceBuildableLibDependency` prevents us from importing a non-buildable library into a buildable one.
 
@@ -759,19 +793,27 @@ Let's see how we can configure the ESLint rule to enforce the above constraints.
     "depConstraints": [
       {
         "sourceTag": "type:app",
-        "onlyDependOnLibsWithTags": ["type:feature", "type:ui", "type:util"]
+        "onlyDependOnLibsWithTags": [
+          "type:feature", "type:ui", "type:util"
+        ]
       },
       {
         "sourceTag": "type:feature",
-        "onlyDependOnLibsWithTags": ["type:feature", "type:ui", "type:util"]
+        "onlyDependOnLibsWithTags": [
+          "type:feature", "type:ui", "type:util"
+        ]
       },
       {
         "sourceTag": "type:ui",
-        "onlyDependOnLibsWithTags": ["type:ui", "type:util"]
+        "onlyDependOnLibsWithTags": [
+          "type:ui", "type:util"
+        ]
       },
       {
         "sourceTag": "type:util",
-        "onlyDependOnLibsWithTags": ["type:util"]
+        "onlyDependOnLibsWithTags": [
+          "type:util"
+        ]
       }
     ]
   }
@@ -780,7 +822,8 @@ Let's see how we can configure the ESLint rule to enforce the above constraints.
 
 Further, recall that we also have a second dimension to the tags of our libraries (e.g. `--tag scope:books`). The `scope` tag allows us to separate our applications and libraries into logical domains.
 
-Imagine that we want to add an **admin** application to our workspace in order to manage our books. We can create such application with `nx g app admin --tags type:app,scope:admin`. It is likely that there will be some shared libraries required by both **admin** and **books** applications.
+Imagine that we want to add an **admin** application to our workspace in order to manage our books. We can create such application with  
+`nx g app admin --tags type:app,scope:admin`. It is likely that there will be some shared libraries required by both **admin** and **books** applications.
 
 For example, if we have common components--such as buttons, modals, etc.-- then we can generate a shared library as follows.
 
@@ -804,16 +847,22 @@ This is how we would define the constraints.
     "depConstraints": [
       {
         "sourceTag": "type:app",
-        "onlyDependOnLibsWithTags": ["type:feature", "type:ui", "type:util"]
+        "onlyDependOnLibsWithTags": [
+          "type:feature", "type:ui", "type:util"
+        ]
       },
       ...
       {
         "sourceTag": "scope:books",
-        "onlyDependOnLibsWithTags": ["scope:shared", "scope:books"]
+        "onlyDependOnLibsWithTags": [
+          "scope:shared", "scope:books"
+        ]
       },
       {
         "sourceTag": "scope:admin",
-        "onlyDependOnLibsWithTags": ["scope:shared", "scope:admin"]
+        "onlyDependOnLibsWithTags": [
+          "scope:shared", "scope:admin"
+        ]
       },
       {
         "sourceTag": "scope:shared",
@@ -826,7 +875,8 @@ This is how we would define the constraints.
 
 By forbidding cross-scope dependencies we can prevent a feature from `admin` being used in the `books` application. Also, domain-specific logic can be safely guarded against being used in the wrong domains.
 
-These module boundaries are needed as the workspace grows, otherwise projects will become unmanageable, and changes will be hard to reason about. You can customize the tags however you want. If you have a multi-platform monorepo, you might add `platform:web`, `platform:node`,  `platform:native`, and `platform:all` tags.
+These module boundaries are needed as the workspace grows, otherwise projects will become unmanageable, and changes will be hard to reason about. You can customize the tags however you want. If you have a multi-platform monorepo, you might add `platform:web`,  
+`platform:node`,  `platform:native`, and `platform:all` tags.
 
 Learn more about configuring boundaries with the Taming Code Organization with Module Boundaries in Nx article[^masteringboundaries].
 
